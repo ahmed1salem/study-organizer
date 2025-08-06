@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مُنظِّم المذاكرة الذكي</title>
+    <!-- Google Fonts for a nice Arabic font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* === CSS Styles === */
+        :root {
+            --primary-color: #4a90e2;
+            --primary-dark: #357abd;
+            --secondary-color: #f5f7fa;
+            --font-color: #333;
+            --border-color: #e0e0e0;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --success-color: #28a745;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            background-color: var(--secondary-color);
+            color: var(--font-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin: 0;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2, .card h3 {
+            margin-top: 0;
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="url"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+            display: block;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        button.success {
+            background-color: var(--success-color);
+        }
+        
+        button.success:hover {
+            background-color: #218838;
+        }
+
+        #subjects-list {
+            list-style-type: none;
+            padding: 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #subjects-list li {
+            padding: 15px;
+            background-color: var(--secondary-color);
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s, transform 0.2s;
+            font-weight: bold;
+        }
+
+        #subjects-list li.active, #subjects-list li:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateX(-5px);
+        }
+        
+        #main-content {
+            display: none; /* Hidden by default */
+        }
+        
+        .resource-item, .flashcard-item {
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        
+        .resource-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .resource-item a:hover {
+            text-decoration: underline;
+        }
+        
+        .flashcard-item p {
+            margin: 5px 0;
+        }
+
+        /* Loader Animation */
+        .loader-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            z-index: 999;
+        }
+        .loader {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid var(--primary-color);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loader-overlay" id="loader">
+        <div class="loader"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>🎓 مُنظِّم المذاكرة الذكي</h1>
+            <p>نظّم موادك، اجمع مصادرك، وأنشئ خططًا بسيطة للمذاكرة.</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- ========== قسم المواد الدراسية ========== -->
+            <div class="card">
+                <h2>المواد الدراسية</h2>
+                <div id="add-subject-form">
+                    <input type="text" id="subject-name-input" placeholder="اسم المادة الجديدة (مثال: فيزياء)">
+                    <button onclick="addSubject()">إضافة مادة</button>
+                </div>
+                <ul id="subjects-list" style="margin-top: 20px;">
+                    <!-- سيتم ملء المواد هنا عبر JavaScript -->
+                </ul>
+            </div>
+
+            <!-- ========== قسم المحتوى الرئيسي ========== -->
+            <div id="main-content">
+                <div class="card">
+                    <h2 id="current-subject-title">اختر مادة للبدء</h2>
+                    
+                    <!-- مكتبة الموارد -->
+                    <div id="resource-library">
+                        <h3>📚 مكتبة الموارد</h3>
+                        <div id="resources-list"></div>
+                        <h4>إضافة مورد جديد:</h4>
+                        <input type="text" id="resource-title-input" placeholder="عنوان المورد (مثال: شرح الدرس الأول)">
+                        <select id="resource-type-select">
+                            <option value="youtube">رابط يوتيوب</option>
+                            <option value="link">رابط موقع/ملف</option>
+                            <option value="note">ملاحظة نصية</option>
+                        </select>
+                        <textarea id="resource-content-input" placeholder="ضع الرابط هنا أو اكتب ملاحظتك" rows="3"></textarea>
+                        <button onclick="addResource()">إضافة المورد</button>
+                    </div>
+
+                    <hr style="margin: 40px 0; border: 1px solid var(--border-color);">
+
+                    <!-- صانع البطاقات التعليمية -->
+                    <div id="flashcard-maker">
+                        <h3>🃏 صانع البطاقات التعليمية</h3>
+                        <div id="flashcards-list"></div>
+                        <h4>إنشاء بطاقة جديدة:</h4>
+                        <input type="text" id="flashcard-question-input" placeholder="اكتب السؤال هنا">
+                        <textarea id="flashcard-answer-input" placeholder="اكتب الجواب هنا" rows="2"></textarea>
+                        <button onclick="addFlashcard()">إضافة بطاقة</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== قسم مولد الخطة الدراسية ========== -->
+        <div class="card" style="margin-top: 30px;">
+            <h2>📅 مولد خطة المذاكرة الأسبوعية</h2>
+            <p>اختر المواد التي تود مراجعتها هذا الأسبوع، وسنقترح عليك جدولًا بسيطًا.</p>
+            <div id="study-plan-subjects">
+                <!-- سيتم عرض المواد هنا للاختيار -->
+            </div>
+            <button onclick="generateStudyPlan()" class="success" style="margin-top: 10px;">توليد الخطة</button>
+            <div id="study-plan-output" style="margin-top: 20px; background: #e9f5e9; padding: 15px; border-radius: 8px;"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // === JavaScript Logic ===
+        
+        // !!! هام جدًا: استبدل هذا الرابط بالرابط الذي نسخته من Google Apps Script !!!
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwDet2ZVD4ixnoXeBQZT6Bd4XrmMIwfsdf2TLeo-eBvHRjigENkPqBWtVqXz2dYtotscA/exec"; 
+
+        let currentSubjectId = null;
+
+        const loader = document.getElementById('loader');
+        function showLoader() { loader.style.display = 'block'; }
+        function hideLoader() { loader.style.display = 'none'; }
+
+        // دالة مركزية للتواصل مع Apps Script (نسخة محدثة تستخدم POST)
+        async function callAppsScript(funcName, args = []) {
+            showLoader();
+            try {
+                const payload = {
+                    action: funcName,
+                    params: args
+                };
+
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors', // Explicitly set mode for clarity
+                    redirect: 'follow',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8', // Use text/plain to avoid preflight
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) {
+                    throw new Error(`Network response was not ok: ${res.status}`);
+                }
+
+                const responseData = await res.json();
+
+                if (responseData.status === 'error') {
+                    throw new Error(responseData.message);
+                }
+
+                return responseData.data; // Return the actual data from the successful response
+
+            } catch (error) {
+                console.error('Error calling Apps Script:', error);
+                alert(`حدث خطأ: ${error.message}. الرجاء التأكد من أنك قمت بنشر نسخة جديدة من Apps Script مع الأذونات الصحيحة (Anyone).`);
+                return null;
+            } finally {
+                hideLoader();
+            }
+        }
+
+        // --- دالات خاصة بالمواد ---
+        async function loadSubjects() {
+            const subjects = await callAppsScript('getSubjects');
+            if (!subjects) return;
+
+            const subjectsList = document.getElementById('subjects-list');
+            const planSubjectsDiv = document.getElementById('study-plan-subjects');
+            subjectsList.innerHTML = '';
+            planSubjectsDiv.innerHTML = '';
+            
+            subjects.forEach(subject => {
+                const li = document.createElement('li');
+                li.textContent = subject.name;
+                li.dataset.id = subject.id;
+                li.onclick = () => selectSubject(subject.id, subject.name);
+                subjectsList.appendChild(li);
+
+                const checkboxHTML = `
+                    <label style="margin-left: 15px; display: inline-block; margin-bottom: 5px;">
+                        <input type="checkbox" class="study-subject" value="${subject.name}"> ${subject.name}
+                    </label>`;
+                planSubjectsDiv.innerHTML += checkboxHTML;
+            });
+        }
+
+        async function addSubject() {
+            const input = document.getElementById('subject-name-input');
+            const name = input.value.trim();
+            if (!name) return alert('الرجاء إدخال اسم المادة.');
+            
+            const newSubject = await callAppsScript('addSubject', [name]);
+            if (newSubject) {
+                input.value = '';
+                await loadSubjects();
+                selectSubject(newSubject.id, newSubject.name);
+            }
+        }
+
+        function selectSubject(id, name) {
+            currentSubjectId = id;
+            document.getElementById('current-subject-title').textContent = `محتوى مادة: ${name}`;
+            document.getElementById('main-content').style.display = 'block';
+            
+            document.querySelectorAll('#subjects-list li').forEach(li => {
+                li.classList.toggle('active', li.dataset.id === id);
+            });
+
+            loadResources();
+            loadFlashcards();
+        }
+
+        // --- دالات خاصة بالموارد ---
+        async function loadResources() {
+            if (!currentSubjectId) return;
+            const resources = await callAppsScript('getResources', [currentSubjectId]);
+            const list = document.getElementById('resources-list');
+            list.innerHTML = '';
+            if (resources && resources.length > 0) {
+                resources.forEach(res => {
+                    const div = document.createElement('div');
+                    div.className = 'resource-item';
+                    let contentHTML = `<strong>${res.title} (${res.type === 'youtube' ? 'يوتيوب' : (res.type === 'link' ? 'رابط' : 'ملاحظة')}):</strong>`;
+                    if (res.type === 'note') {
+                        contentHTML += `<p style="margin-top: 5px;">${res.content.replace(/\n/g, '<br>')}</p>`;
+                    } else {
+                        contentHTML += ` <a href="${res.content}" target="_blank">فتح المصدر</a>`;
+                    }
+                    div.innerHTML = contentHTML;
+                    list.appendChild(div);
+                });
+            } else {
+                list.innerHTML = '<p>لا توجد موارد لهذه المادة بعد.</p>';
+            }
+        }
+
+        async function addResource() {
+            if (!currentSubjectId) return alert('الرجاء اختيار مادة أولاً.');
+            
+            const title = document.getElementById('resource-title-input').value.trim();
+            const type = document.getElementById('resource-type-select').value;
+            const content = document.getElementById('resource-content-input').value.trim();
+
+            if (!title || !content) return alert('الرجاء ملء جميع حقول المورد.');
+            
+            const newResource = await callAppsScript('addResource', [currentSubjectId, type, content, title]);
+            if (newResource) {
+                document.getElementById('resource-title-input').value = '';
+                document.getElementById('resource-content-input').value = '';
+                loadResources();
+            }
+        }
+
+        // --- دالات خاصة بالبطاقات ---
+        async function loadFlashcards() {
+            if (!currentSubjectId) return;
+            const flashcards = await callAppsScript('getFlashcards', [currentSubjectId]);
+            const list = document.getElementById('flashcards-list');
+            list.innerHTML = '';
+            if (flashcards && flashcards.length > 0) {
+                flashcards.forEach(card => {
+                    const div = document.createElement('div');
+                    div.className = 'flashcard-item';
+                    div.innerHTML = `<p><strong>س:</strong> ${card.question}</p><p><strong>ج:</strong> ${card.answer}</p>`;
+                    list.appendChild(div);
+                });
+            } else {
+                list.innerHTML = '<p>لا توجد بطاقات مراجعة لهذه المادة بعد.</p>';
+            }
+        }
+
+        async function addFlashcard() {
+            if (!currentSubjectId) return alert('الرجاء اختيار مادة أولاً.');
+
+            const question = document.getElementById('flashcard-question-input').value.trim();
+            const answer = document.getElementById('flashcard-answer-input').value.trim();
+
+            if (!question || !answer) return alert('الرجاء ملء السؤال والجواب.');
+            
+            const newCard = await callAppsScript('addFlashcard', [currentSubjectId, question, answer]);
+            if (newCard) {
+                document.getElementById('flashcard-question-input').value = '';
+                document.getElementById('flashcard-answer-input').value = '';
+                loadFlashcards();
+            }
+        }
+
+        // --- دالة توليد الخطة الدراسية ---
+        function generateStudyPlan() {
+            const selectedSubjects = Array.from(document.querySelectorAll('.study-subject:checked')).map(cb => cb.value);
+            const output = document.getElementById('study-plan-output');
+            
+            if (selectedSubjects.length === 0) {
+                output.innerHTML = '<p style="color: red;">الرجاء اختيار مادة واحدة على الأقل من قائمة المواد الدراسية.</p>';
+                return;
+            }
+            
+            const days = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
+            let planHTML = '<h4>🗓️ خطتك المقترحة:</h4><ul>';
+            
+            for (let i = 0; i < days.length; i++) {
+                const subjectForToday = selectedSubjects[i % selectedSubjects.length];
+                planHTML += `<li><strong>${days[i]}:</strong> مذاكرة مادة "${subjectForToday}"</li>`;
+            }
+            
+            planHTML += '</ul><p>بالتوفيق في مذاكرتك!</p>';
+            output.innerHTML = planHTML;
+        }
+
+        // تحميل البيانات الأولية عند فتح الصفحة
+        window.onload = loadSubjects;
+    </script>
+</body>
+</html>
