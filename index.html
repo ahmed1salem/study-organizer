@@ -47,10 +47,13 @@
         .quiz-controls button { width: auto; }
         .quiz-controls .know-btn { background-color: var(--success-color); }
         .quiz-controls .dont-know-btn { background-color: var(--danger-color); }
-        .flashcard-status { font-size: 0.8em; padding: 3px 8px; border-radius: 12px; color: white; }
+        .flashcard-status, .resource-item { font-size: 0.8em; padding: 3px 8px; border-radius: 12px; color: white; }
         .status-New { background-color: var(--info-color); }
         .status-Learning { background-color: var(--warning-color); }
         .status-Mastered { background-color: var(--success-color); }
+        .resource-item { background: #fafafa; color: var(--font-color); padding: 15px; margin-bottom: 10px; }
+        .resource-item a { color: var(--primary-color); font-weight: bold; text-decoration: none; }
+        .resource-item a:hover { text-decoration: underline; }
         @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -95,7 +98,19 @@
             <div id="main-content" style="display: none;">
                 <div class="card">
                     <h2 id="current-subject-title">اختر مادة للبدء</h2>
-                    <div id="resource-library"></div>
+                    <div id="resource-library">
+                        <h3>📚 مكتبة الموارد</h3>
+                        <div id="resources-list"></div>
+                        <h4>إضافة مورد جديد:</h4>
+                        <input type="text" id="resource-title-input" placeholder="عنوان المورد">
+                        <select id="resource-type-select">
+                            <option value="youtube">رابط يوتيوب</option>
+                            <option value="link">رابط موقع/ملف</option>
+                            <option value="note">ملاحظة نصية</option>
+                        </select>
+                        <textarea id="resource-content-input" placeholder="ضع الرابط هنا أو اكتب ملاحظتك" rows="3"></textarea>
+                        <button onclick="addResource()">إضافة المورد</button>
+                    </div>
                     <hr style="margin: 40px 0; border: 1px solid var(--border-color);">
                     <div id="flashcard-maker">
                         <h3>🃏 البطاقات التعليمية <button id="start-quiz-btn" class="success" style="display: inline-block; width: auto; float: left; padding: 8px 15px; font-size: 0.8em;" onclick="startQuiz()">بدء الاختبار الذكي</button></h3>
@@ -178,7 +193,6 @@
         }
 
         function logout() {
-            // Reset all state
             [currentUserId, currentUsername, currentSubjectId, currentSubjectName] = [null, null, null, null];
             [subjectData, flashcardData] = [[], []];
             document.getElementById('app-section').style.display = 'none';
@@ -222,7 +236,45 @@
             document.getElementById('current-subject-title').textContent = `محتوى مادة: ${name}`;
             document.getElementById('main-content').style.display = 'block';
             document.querySelectorAll('#subjects-list li').forEach(li => li.classList.toggle('active', li.dataset.id === id));
+            loadResources();
             loadFlashcards();
+        }
+
+        async function loadResources() {
+            if (!currentUserId || !currentSubjectId) return;
+            const resources = await callAppsScript('getResources', [currentUserId, currentSubjectId]);
+            const list = document.getElementById('resources-list');
+            list.innerHTML = '';
+            if (resources && resources.length > 0) {
+                resources.forEach(res => {
+                    const div = document.createElement('div');
+                    div.className = 'resource-item';
+                    let contentHTML = `<strong>${res.title} (${res.type === 'youtube' ? 'يوتيوب' : (res.type === 'link' ? 'رابط' : 'ملاحظة')}):</strong>`;
+                    if (res.type === 'note') {
+                        contentHTML += `<p style="margin-top: 5px;">${res.content.replace(/\n/g, '<br>')}</p>`;
+                    } else {
+                        contentHTML += ` <a href="${res.content}" target="_blank">فتح المصدر</a>`;
+                    }
+                    div.innerHTML = contentHTML;
+                    list.appendChild(div);
+                });
+            } else {
+                list.innerHTML = '<p>لا توجد موارد لهذه المادة بعد.</p>';
+            }
+        }
+
+        async function addResource() {
+            if (!currentUserId || !currentSubjectId) return alert('الرجاء اختيار مادة أولاً.');
+            const title = document.getElementById('resource-title-input').value.trim();
+            const type = document.getElementById('resource-type-select').value;
+            const content = document.getElementById('resource-content-input').value.trim();
+            if (!title || !content) return alert('الرجاء ملء جميع حقول المورد.');
+            const newResource = await callAppsScript('addResource', [currentUserId, currentSubjectId, type, content, title]);
+            if (newResource) {
+                document.getElementById('resource-title-input').value = '';
+                document.getElementById('resource-content-input').value = '';
+                loadResources();
+            }
         }
 
         async function loadFlashcards() {
@@ -256,57 +308,42 @@
 
         async function generateSmartStudyPlan() {
             if (subjectData.length === 0) return alert('الرجاء إضافة مواد أولاً.');
-            
             const priorityValues = { 'High': 3, 'Medium': 2, 'Low': 1 };
             const now = new Date();
-
             const scoredSubjects = subjectData.map(s => {
                 const daysSinceStudied = s.lastStudied ? (now - new Date(s.lastStudied)) / (1000 * 3600 * 24) : 999;
-                // Score is a mix of priority and how long it's been since last studied
                 const score = priorityValues[s.priority] * 2 + daysSinceStudied;
                 return { ...s, score };
-            }).sort((a, b) => b.score - a.score); // Sort by highest score
-
+            }).sort((a, b) => b.score - a.score);
             const days = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
             let planHTML = '<h4>🗓️ خطتك الذكية المقترحة:</h4><ul>';
-            
             for (let i = 0; i < days.length; i++) {
                 const subjectForToday = scoredSubjects[i % scoredSubjects.length];
                 planHTML += `<li><strong>${days[i]}:</strong> مذاكرة مادة "${subjectForToday.name}"</li>`;
-                // Update last studied date for this subject in the backend
                 callAppsScript('updateLastStudied', [currentUserId, subjectForToday.id]);
             }
             planHTML += '</ul><p>تم تحديث تواريخ المراجعة. بالتوفيق!</p>';
             document.getElementById('study-plan-output').innerHTML = planHTML;
-            // Reload subjects to reflect new dates, but don't show loader
             setTimeout(loadSubjects, 1000);
         }
 
-        // --- Smart Quiz Logic ---
         let quizFlashcards = [];
         let currentCardIndex = 0;
-
         function startQuiz() {
             if (flashcardData.length === 0) return alert('لا توجد بطاقات لبدء الاختبار.');
-            // Prioritize 'New' and 'Learning' cards
             const learning = flashcardData.filter(c => c.status !== 'Mastered');
             const mastered = flashcardData.filter(c => c.status === 'Mastered');
-            // Show all learning cards, then a few mastered cards for revision
             quizFlashcards = [...learning, ...mastered.slice(0, 3)].sort(() => Math.random() - 0.5);
-
             if (quizFlashcards.length === 0) return alert('رائع! لقد أتقنت جميع البطاقات.');
-            
             currentCardIndex = 0;
             document.getElementById('quiz-subject-title').innerText = `اختبار في مادة: ${currentSubjectName}`;
             document.getElementById('quiz-modal').style.display = 'block';
             displayQuizCard();
         }
-
         function closeQuiz() { 
             document.getElementById('quiz-modal').style.display = 'none';
-            loadFlashcards(); // Refresh list to show updated statuses
+            loadFlashcards();
         }
-
         function displayQuizCard() {
             const card = quizFlashcards[currentCardIndex];
             document.getElementById('quiz-question').innerText = card.question;
@@ -314,16 +351,13 @@
             document.getElementById('quiz-question').style.display = 'block';
             document.getElementById('quiz-answer').style.display = 'none';
         }
-
         function revealAnswer() {
             document.getElementById('quiz-question').style.display = 'none';
             document.getElementById('quiz-answer').style.display = 'block';
         }
-
         async function handleQuizResponse(status) {
             const card = quizFlashcards[currentCardIndex];
             await callAppsScript('updateFlashcardStatus', [currentUserId, card.id, status]);
-            
             currentCardIndex++;
             if (currentCardIndex >= quizFlashcards.length) {
                 alert('لقد أكملت جولة المراجعة الحالية!');
