@@ -45,11 +45,13 @@
         #welcome-message { float: left; margin-top: 10px; font-weight: bold; }
         .close-button { color: #aaa; float: left; font-size: 28px; font-weight: bold; cursor: pointer; }
         
-        /* --- AI Assistant Styles (Upgraded) --- */
+        /* --- AI Assistant Styles --- */
         #ai-fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: linear-gradient(45deg, var(--info-color), var(--primary-color)); color: white; border-radius: 50%; border: none; font-size: 2em; text-align: center; line-height: 60px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; z-index: 999; transition: transform 0.3s ease; }
         #ai-fab:hover { transform: scale(1.1); }
         #ai-modal .modal-content { max-width: 600px; height: 70vh; display: flex; flex-direction: column; padding: 0; text-align: right; }
-        #ai-modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); }
+        #ai-modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        #ai-modal-header h3 { margin: 0; border: none; padding: 0; }
+        #new-chat-btn { width: auto; font-size: 0.8em; padding: 5px 15px; background-color: var(--success-color); }
         #ai-chat-history { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
         .chat-bubble { padding: 10px 15px; border-radius: 20px; max-width: 80%; word-wrap: break-word; }
         .user-bubble { background-color: var(--primary-color); color: white; border-bottom-right-radius: 5px; align-self: flex-start; }
@@ -58,8 +60,6 @@
         #ai-input-container { padding: 15px; border-top: 1px solid var(--border-color); display: flex; gap: 10px; }
         #ai-input-container input { flex-grow: 1; margin-bottom: 0; }
         #ai-input-container button { width: auto; border-radius: 8px; }
-        
-        /* --- New Typing Indicator Animation --- */
         .typing-indicator { align-self: flex-end; }
         .typing-indicator span { height: 8px; width: 8px; margin: 0 2px; background-color: #999; border-radius: 50%; display: inline-block; animation: bounce 1.4s infinite ease-in-out both; }
         .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
@@ -69,7 +69,15 @@
         .flashcard-status, .resource-item { font-size: 0.8em; padding: 3px 8px; border-radius: 12px; color: white; }
         .resource-item { background: #fafafa; color: var(--font-color); padding: 15px; margin-bottom: 10px; }
         .resource-item a { color: var(--primary-color); font-weight: bold; text-decoration: none; }
-        @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
+        
+        @media (max-width: 768px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .container { padding: 0 10px; }
+            header h1 { font-size: 1.8em; }
+            .card { padding: 15px; }
+            #welcome-message { display: none; }
+            #ai-modal .modal-content { width: 100%; height: 100%; max-width: 100%; margin: 0; border-radius: 0; }
+        }
     </style>
 </head>
 <body>
@@ -93,22 +101,7 @@
 
     <button id="ai-fab" onclick="openAIModal()" title="المساعد الذكي">🤖</button>
 
-    <div id="ai-modal" class="modal">
-        <div class="modal-content">
-            <div id="ai-modal-header">
-                <span class="close-button" onclick="closeAIModal()">&times;</span>
-                <h3>🤖 المساعد الذكي</h3>
-            </div>
-            <div id="ai-chat-history">
-                <div class="chat-bubble ai-bubble">أهلاً بك! كيف يمكنني مساعدتك في مذاكرتك اليوم؟</div>
-            </div>
-            <div id="ai-input-container">
-                <input type="text" id="ai-prompt" placeholder="اكتب سؤالك هنا..." onkeydown="if(event.key==='Enter') askAI()">
-                <button onclick="askAI()">إرسال</button>
-            </div>
-        </div>
-    </div>
-
+    <div id="ai-modal" class="modal"></div>
     <div id="quiz-modal" class="modal"></div>
 
     <script>
@@ -147,6 +140,15 @@
         function openAIModal() { document.getElementById('ai-modal').style.display = 'block'; }
         function closeAIModal() { document.getElementById('ai-modal').style.display = 'none'; }
         
+        function newAIChat() {
+            const chatHistory = document.getElementById('ai-chat-history');
+            chatHistory.innerHTML = ''; // Clear history
+            const welcomeBubble = document.createElement('div');
+            welcomeBubble.className = 'chat-bubble ai-bubble';
+            welcomeBubble.textContent = 'أهلاً بك! كيف يمكنني مساعدتك في مذاكرتك اليوم؟';
+            chatHistory.appendChild(welcomeBubble);
+        }
+
         async function askAI() {
             const promptInput = document.getElementById('ai-prompt');
             const prompt = promptInput.value.trim();
@@ -162,14 +164,12 @@
             promptInput.value = '';
             chatHistory.scrollTop = chatHistory.scrollHeight;
 
-            // Display typing indicator instead of global loader
             const typingIndicator = document.createElement('div');
             typingIndicator.className = 'chat-bubble typing-indicator';
             typingIndicator.innerHTML = '<span></span><span></span><span></span>';
             chatHistory.appendChild(typingIndicator);
             chatHistory.scrollTop = chatHistory.scrollHeight;
             
-            // Call AI without the global loader
             const result = await callAppsScript('callGeminiAI', [prompt], false);
             
             chatHistory.removeChild(typingIndicator);
@@ -244,10 +244,23 @@
                 <button onclick="generateSmartStudyPlan()" class="success" style="margin-top: 10px;">توليد خطة ذكية</button>
                 <div id="study-plan-output" style="margin-top: 20px; background: #e9f5e9; padding: 15px; border-radius: 8px;"></div>`;
             
-            const quizModal = document.createElement('div');
-            quizModal.id = 'quiz-modal';
-            quizModal.className = 'modal';
-            quizModal.innerHTML = `
+            document.getElementById('ai-modal').innerHTML = `
+                <div class="modal-content">
+                    <div id="ai-modal-header">
+                        <span class="close-button" onclick="closeAIModal()">&times;</span>
+                        <h3>🤖 المساعد الذكي</h3>
+                        <button id="new-chat-btn" onclick="newAIChat()">شات جديد</button>
+                    </div>
+                    <div id="ai-chat-history">
+                        <div class="chat-bubble ai-bubble">أهلاً بك! كيف يمكنني مساعدتك في مذاكرتك اليوم؟</div>
+                    </div>
+                    <div id="ai-input-container">
+                        <input type="text" id="ai-prompt" placeholder="اكتب سؤالك هنا..." onkeydown="if(event.key==='Enter') askAI()">
+                        <button onclick="askAI()">إرسال</button>
+                    </div>
+                </div>`;
+            
+            document.getElementById('quiz-modal').innerHTML = `
                 <div class="modal-content">
                     <span class="close-button" onclick="closeQuiz()">&times;</span>
                     <h3 id="quiz-subject-title">الاختبار الذكي</h3>
@@ -260,7 +273,6 @@
                         <button class="know-btn" onclick="handleQuizResponse('Mastered')">أعرفها</button>
                     </div>
                 </div>`;
-            document.body.appendChild(quizModal);
         }
 
         async function login() {
@@ -421,16 +433,18 @@
         }
         function displayQuizCard() {
             const card = quizFlashcards[currentCardIndex];
-            document.getElementById('quiz-question').innerText = card.question;
-            document.getElementById('quiz-answer').innerText = card.answer;
-            document.getElementById('quiz-question').style.display = 'block';
-            document.getElementById('quiz-answer').style.display = 'none';
-            document.querySelector('#quiz-modal .quiz-controls').style.display = 'none';
+            const quizModal = document.getElementById('quiz-modal');
+            quizModal.querySelector('#quiz-question').innerText = card.question;
+            quizModal.querySelector('#quiz-answer').innerText = card.answer;
+            quizModal.querySelector('#quiz-question').style.display = 'block';
+            quizModal.querySelector('#quiz-answer').style.display = 'none';
+            quizModal.querySelector('.quiz-controls').style.display = 'none';
         }
         function revealAnswer() {
-            document.getElementById('quiz-question').style.display = 'none';
-            document.getElementById('quiz-answer').style.display = 'block';
-            document.querySelector('#quiz-modal .quiz-controls').style.display = 'flex';
+            const quizModal = document.getElementById('quiz-modal');
+            quizModal.querySelector('#quiz-question').style.display = 'none';
+            quizModal.querySelector('#quiz-answer').style.display = 'block';
+            quizModal.querySelector('.quiz-controls').style.display = 'flex';
         }
         async function handleQuizResponse(status) {
             const card = quizFlashcards[currentCardIndex];
