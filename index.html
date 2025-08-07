@@ -25,7 +25,8 @@
         .card { background-color: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: var(--shadow); }
         .card h2, .card h3 { margin-top: 0; color: var(--primary-dark); border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; margin-bottom: 20px; }
         input, textarea, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; box-sizing: border-box; }
-        button { background-color: var(--primary-color); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold; width: 100%; }
+        button { background-color: var(--primary-color); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold; width: 100%; transition: background-color 0.3s; }
+        button:hover { background-color: var(--primary-dark); }
         #subjects-list { list-style-type: none; padding: 0; max-height: 400px; overflow-y: auto; }
         #subjects-list li { padding: 15px; background-color: var(--secondary-color); margin-bottom: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         #subjects-list li.active, #subjects-list li:hover { background-color: var(--primary-color); color: white; }
@@ -37,38 +38,110 @@
         .loader { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 8px solid #f3f3f3; border-top: 8px solid var(--primary-color); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
-        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 30px; border: 1px solid #888; width: 80%; max-width: 700px; border-radius: 12px; text-align: right; }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 30px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 12px; text-align: center; }
         #login-section { max-width: 400px; margin: 50px auto; }
         #app-section { display: none; }
         #logout-btn { background-color: var(--danger-color); width: auto; padding: 8px 20px; font-size: 0.9em; }
         #welcome-message { float: left; margin-top: 10px; font-weight: bold; }
         .close-button { color: #aaa; float: left; font-size: 28px; font-weight: bold; cursor: pointer; }
-        #ai-assistant-btn { position: absolute; top: 20px; left: 20px; background-color: var(--info-color); border-radius: 50%; width: 50px; height: 50px; padding: 0; font-size: 1.5em; line-height: 50px; text-align: center; }
-        #ai-response { background-color: #f9f9f9; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; min-height: 100px; margin-top: 15px; text-align: right; }
-        #ai-response p, #ai-response h3, #ai-response li { margin-bottom: 10px; }
+        
+        /* --- New AI Assistant Styles --- */
+        #ai-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--info-color), var(--primary-color));
+            color: white;
+            border-radius: 50%;
+            border: none;
+            font-size: 2em;
+            text-align: center;
+            line-height: 60px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 999;
+            transition: transform 0.3s ease;
+        }
+        #ai-fab:hover {
+            transform: scale(1.1);
+        }
+        #ai-modal .modal-content {
+            max-width: 600px;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            text-align: right;
+        }
+        #ai-modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        #ai-chat-history {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .chat-bubble {
+            padding: 10px 15px;
+            border-radius: 20px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .user-bubble {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 5px;
+            align-self: flex-start;
+        }
+        .ai-bubble {
+            background-color: #e9e9eb;
+            color: var(--font-color);
+            border-bottom-left-radius: 5px;
+            align-self: flex-end;
+        }
+        .ai-bubble p:last-child, .ai-bubble ul:last-child {
+            margin-bottom: 0;
+        }
+        .typing-indicator {
+            align-self: flex-end;
+            font-style: italic;
+            color: #999;
+        }
+        #ai-input-container {
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+        }
+        #ai-input-container input {
+            flex-grow: 1;
+            margin-bottom: 0;
+        }
+        #ai-input-container button {
+            width: auto;
+            border-radius: 8px;
+        }
+        
         .flashcard-status, .resource-item { font-size: 0.8em; padding: 3px 8px; border-radius: 12px; color: white; }
         .resource-item { background: #fafafa; color: var(--font-color); padding: 15px; margin-bottom: 10px; }
         .resource-item a { color: var(--primary-color); font-weight: bold; text-decoration: none; }
-        @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } #ai-assistant-btn { top: auto; bottom: 20px; right: 20px; left: auto; position: fixed; z-index: 999; } }
+        @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
     <div class="loader-overlay" id="loader"></div>
 
-    <div id="login-section" class="container">
-        <div class="card">
-            <h2 style="text-align: center;">تسجيل الدخول</h2>
-            <p id="login-error" style="color: red; text-align: center;"></p>
-            <input type="text" id="username-input" placeholder="اسم المستخدم (باللغة الإنجليزية)">
-            <input type="password" id="password-input" placeholder="كلمة المرور">
-            <button onclick="login()">دخول</button>
-        </div>
-    </div>
+    <div id="login-section" class="container"></div>
 
     <div id="app-section" class="container">
         <header>
-            <button id="ai-assistant-btn" onclick="openAIModal()" title="المساعد الذكي">🤖</button>
             <div style="overflow: hidden;">
                 <span id="welcome-message"></span>
                 <button id="logout-btn" onclick="logout()" style="float: right;">تسجيل الخروج</button>
@@ -77,87 +150,40 @@
         </header>
 
         <div class="main-grid">
-            <div class="card">
-                <h2>المواد الدراسية</h2>
-                <div id="add-subject-form">
-                    <input type="text" id="subject-name-input" placeholder="اسم المادة الجديدة">
-                    <select id="subject-priority-select">
-                        <option value="High">أولوية عالية</option>
-                        <option value="Medium" selected>أولوية متوسطة</option>
-                        <option value="Low">أولوية منخفضة</option>
-                    </select>
-                    <button onclick="addSubject()">إضافة مادة</button>
-                </div>
-                <ul id="subjects-list" style="margin-top: 20px;"></ul>
-            </div>
-
-            <div id="main-content" style="display: none;">
-                <div class="card">
-                    <h2 id="current-subject-title">اختر مادة للبدء</h2>
-                    <div id="resource-library">
-                        <h3>📚 مكتبة الموارد</h3>
-                        <div id="resources-list"></div>
-                        <h4>إضافة مورد جديد:</h4>
-                        <input type="text" id="resource-title-input" placeholder="عنوان المورد">
-                        <select id="resource-type-select">
-                            <option value="youtube">رابط يوتيوب</option>
-                            <option value="link">رابط موقع/ملف</option>
-                            <option value="note">ملاحظة نصية</option>
-                        </select>
-                        <textarea id="resource-content-input" placeholder="ضع الرابط هنا أو اكتب ملاحظتك" rows="3"></textarea>
-                        <button onclick="addResource()">إضافة المورد</button>
-                    </div>
-                    <hr style="margin: 40px 0; border: 1px solid var(--border-color);">
-                    <div id="flashcard-maker">
-                        <h3>🃏 البطاقات التعليمية <button id="start-quiz-btn" class="success" style="display: inline-block; width: auto; float: left; padding: 8px 15px; font-size: 0.8em;" onclick="startQuiz()">بدء الاختبار الذكي</button></h3>
-                        <div id="flashcards-list"></div>
-                        <h4>إنشاء بطاقة جديدة:</h4>
-                        <input type="text" id="flashcard-question-input" placeholder="اكتب السؤال هنا">
-                        <textarea id="flashcard-answer-input" placeholder="اكتب الجواب هنا" rows="2"></textarea>
-                        <button onclick="addFlashcard()">إضافة بطاقة</button>
-                    </div>
-                </div>
-            </div>
+            <!-- Content will be rendered by JS -->
         </div>
         
         <div class="card" style="margin-top: 30px;">
-            <h2>📅 مولد الخطة الدراسية فائق الذكاء</h2>
-            <p>يقوم بإنشاء خطة أسبوعية بناءً على أولوية المواد وآخر مرة تمت مراجعتها.</p>
-            <button onclick="generateSmartStudyPlan()" class="success" style="margin-top: 10px;">توليد خطة ذكية</button>
-            <div id="study-plan-output" style="margin-top: 20px; background: #e9f5e9; padding: 15px; border-radius: 8px;"></div>
+            <!-- Study plan will be rendered by JS -->
         </div>
     </div>
 
-    <!-- AI Assistant Modal -->
+    <!-- AI Assistant Floating Action Button -->
+    <button id="ai-fab" onclick="openAIModal()" title="المساعد الذكي">🤖</button>
+
+    <!-- AI Assistant Modal (New Chat Interface) -->
     <div id="ai-modal" class="modal">
         <div class="modal-content">
-            <span class="close-button" onclick="closeAIModal()">&times;</span>
-            <h3>🤖 المساعد الذكي</h3>
-            <p>اسأل عن أي مفهوم أو اطلب أسئلة مراجعة. مثال: "اشرح لي نظرية فيثاغورس" أو "اعطني 5 أسئلة عن الخلية النباتية".</p>
-            <textarea id="ai-prompt" rows="4" placeholder="اكتب سؤالك هنا..."></textarea>
-            <button onclick="askAI()">اسأل الذكاء الاصطناعي</button>
-            <div id="ai-response">...في انتظار سؤالك</div>
+            <div id="ai-modal-header">
+                <span class="close-button" onclick="closeAIModal()">&times;</span>
+                <h3>🤖 المساعد الذكي</h3>
+            </div>
+            <div id="ai-chat-history">
+                <div class="chat-bubble ai-bubble">أهلاً بك! كيف يمكنني مساعدتك في مذاكرتك اليوم؟</div>
+            </div>
+            <div id="ai-input-container">
+                <input type="text" id="ai-prompt" placeholder="اكتب سؤالك هنا..." onkeydown="if(event.key==='Enter') askAI()">
+                <button onclick="askAI()">إرسال</button>
+            </div>
         </div>
     </div>
 
     <!-- Quiz Modal -->
     <div id="quiz-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeQuiz()">&times;</span>
-            <h3 id="quiz-subject-title">الاختبار الذكي</h3>
-            <div id="quiz-card" onclick="revealAnswer()">
-                <p id="quiz-question"></p>
-                <p id="quiz-answer"></p>
-            </div>
-            <div class="quiz-controls">
-                <button class="dont-know-btn" onclick="handleQuizResponse('Learning')">لا أعرفها</button>
-                <button class="know-btn" onclick="handleQuizResponse('Mastered')">أعرفها</button>
-            </div>
-        </div>
+        <!-- Quiz content remains the same -->
     </div>
 
     <script>
-        // !!! هام جداً: استبدل هذا الرابط برابط Web App الجديد الخاص بك !!!
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxRcYjGGXob_7laRhC1Y8lRPmhiosJoSsw8QKD9tJYGhwmphJPWGz6pyiHzkl2hi3oLJw/exec";
 
         let currentUserId, currentUsername, currentSubjectId, currentSubjectName;
@@ -190,21 +216,131 @@
             }
         }
 
+        // --- New AI Assistant Chat Logic ---
         function openAIModal() { document.getElementById('ai-modal').style.display = 'block'; }
         function closeAIModal() { document.getElementById('ai-modal').style.display = 'none'; }
+        
         async function askAI() {
-            const prompt = document.getElementById('ai-prompt').value;
-            if (!prompt) return alert("الرجاء كتابة سؤال.");
-            const responseDiv = document.getElementById('ai-response');
-            responseDiv.innerHTML = "يفكر المساعد الذكي... 🤔";
+            const promptInput = document.getElementById('ai-prompt');
+            const prompt = promptInput.value.trim();
+            if (!prompt) return;
+
+            const chatHistory = document.getElementById('ai-chat-history');
+
+            // 1. Display user's message
+            const userBubble = document.createElement('div');
+            userBubble.className = 'chat-bubble user-bubble';
+            userBubble.textContent = prompt;
+            chatHistory.appendChild(userBubble);
+            
+            promptInput.value = ''; // Clear input
+            chatHistory.scrollTop = chatHistory.scrollHeight; // Scroll down
+
+            // 2. Display typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'chat-bubble typing-indicator';
+            typingIndicator.textContent = 'المساعد الذكي يفكر...';
+            chatHistory.appendChild(typingIndicator);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            // 3. Call AI and get response
             const result = await callAppsScript('callGeminiAI', [prompt]);
+            
+            chatHistory.removeChild(typingIndicator); // Remove indicator
+
+            // 4. Display AI's message
+            const aiBubble = document.createElement('div');
+            aiBubble.className = 'chat-bubble ai-bubble';
             if (result) {
-                responseDiv.innerHTML = marked.parse(result);
+                aiBubble.innerHTML = marked.parse(result);
             } else {
-                responseDiv.innerText = "عذراً، لم أتمكن من الحصول على إجابة. حاول مرة أخرى.";
+                aiBubble.textContent = "عذراً، لم أتمكن من الحصول على إجابة. حاول مرة أخرى.";
             }
+            chatHistory.appendChild(aiBubble);
+            chatHistory.scrollTop = chatHistory.scrollHeight; // Scroll to the new message
         }
 
+        // --- App Rendering Logic ---
+        function renderInitialUI() {
+            document.getElementById('login-section').innerHTML = `
+                <div class="card">
+                    <h2 style="text-align: center;">تسجيل الدخول</h2>
+                    <p id="login-error" style="color: red; text-align: center;"></p>
+                    <input type="text" id="username-input" placeholder="اسم المستخدم (باللغة الإنجليزية)">
+                    <input type="password" id="password-input" placeholder="كلمة المرور">
+                    <button onclick="login()">دخول</button>
+                </div>`;
+            
+            const appSection = document.getElementById('app-section');
+            appSection.querySelector('.main-grid').innerHTML = `
+                <div class="card">
+                    <h2>المواد الدراسية</h2>
+                    <div id="add-subject-form">
+                        <input type="text" id="subject-name-input" placeholder="اسم المادة الجديدة">
+                        <select id="subject-priority-select">
+                            <option value="High">أولوية عالية</option>
+                            <option value="Medium" selected>أولوية متوسطة</option>
+                            <option value="Low">أولوية منخفضة</option>
+                        </select>
+                        <button onclick="addSubject()">إضافة مادة</button>
+                    </div>
+                    <ul id="subjects-list" style="margin-top: 20px;"></ul>
+                </div>
+                <div id="main-content" style="display: none;">
+                    <div class="card">
+                        <h2 id="current-subject-title">اختر مادة للبدء</h2>
+                        <div id="resource-library">
+                            <h3>📚 مكتبة الموارد</h3>
+                            <div id="resources-list"></div>
+                            <h4>إضافة مورد جديد:</h4>
+                            <input type="text" id="resource-title-input" placeholder="عنوان المورد">
+                            <select id="resource-type-select">
+                                <option value="youtube">رابط يوتيوب</option>
+                                <option value="link">رابط موقع/ملف</option>
+                                <option value="note">ملاحظة نصية</option>
+                            </select>
+                            <textarea id="resource-content-input" placeholder="ضع الرابط هنا أو اكتب ملاحظتك" rows="3"></textarea>
+                            <button onclick="addResource()">إضافة المورد</button>
+                        </div>
+                        <hr style="margin: 40px 0; border: 1px solid var(--border-color);">
+                        <div id="flashcard-maker">
+                            <h3>🃏 البطاقات التعليمية <button id="start-quiz-btn" class="success" style="display: inline-block; width: auto; float: left; padding: 8px 15px; font-size: 0.8em;" onclick="startQuiz()">بدء الاختبار الذكي</button></h3>
+                            <div id="flashcards-list"></div>
+                            <h4>إنشاء بطاقة جديدة:</h4>
+                            <input type="text" id="flashcard-question-input" placeholder="اكتب السؤال هنا">
+                            <textarea id="flashcard-answer-input" placeholder="اكتب الجواب هنا" rows="2"></textarea>
+                            <button onclick="addFlashcard()">إضافة بطاقة</button>
+                        </div>
+                    </div>
+                </div>`;
+            
+            appSection.querySelector('.card[style*="margin-top"]').innerHTML = `
+                <h2>📅 مولد الخطة الدراسية فائق الذكاء</h2>
+                <p>يقوم بإنشاء خطة أسبوعية بناءً على أولوية المواد وآخر مرة تمت مراجعتها.</p>
+                <button onclick="generateSmartStudyPlan()" class="success" style="margin-top: 10px;">توليد خطة ذكية</button>
+                <div id="study-plan-output" style="margin-top: 20px; background: #e9f5e9; padding: 15px; border-radius: 8px;"></div>`;
+            
+            // Render Quiz Modal
+            const quizModal = document.createElement('div');
+            quizModal.id = 'quiz-modal';
+            quizModal.className = 'modal';
+            quizModal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close-button" onclick="closeQuiz()">&times;</span>
+                    <h3 id="quiz-subject-title">الاختبار الذكي</h3>
+                    <div id="quiz-card" onclick="revealAnswer()">
+                        <p id="quiz-question"></p>
+                        <p id="quiz-answer" style="display:none;"></p>
+                    </div>
+                    <div class="quiz-controls" style="display:none;">
+                        <button class="dont-know-btn" onclick="handleQuizResponse('Learning')">لا أعرفها</button>
+                        <button class="know-btn" onclick="handleQuizResponse('Mastered')">أعرفها</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(quizModal);
+        }
+
+        // --- All other JS functions (login, logout, loadSubjects, etc.) remain the same ---
         async function login() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value;
@@ -368,10 +504,12 @@
             document.getElementById('quiz-answer').innerText = card.answer;
             document.getElementById('quiz-question').style.display = 'block';
             document.getElementById('quiz-answer').style.display = 'none';
+            document.querySelector('#quiz-modal .quiz-controls').style.display = 'none';
         }
         function revealAnswer() {
             document.getElementById('quiz-question').style.display = 'none';
             document.getElementById('quiz-answer').style.display = 'block';
+            document.querySelector('#quiz-modal .quiz-controls').style.display = 'flex';
         }
         async function handleQuizResponse(status) {
             const card = quizFlashcards[currentCardIndex];
@@ -386,6 +524,7 @@
         }
 
         window.onload = () => {
+            renderInitialUI();
             document.getElementById('app-section').style.display = 'none';
             document.getElementById('login-section').style.display = 'block';
         };
