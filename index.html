@@ -84,11 +84,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            animation: pulse 2.5s infinite; /* New pulse animation */
+            animation: pulse 2.5s infinite;
         }
         #ai-fab:hover { 
             transform: scale(1.1); 
-            animation-play-state: paused; /* Pause animation on hover */
+            animation-play-state: paused;
         }
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(23, 162, 184, 0.7); }
@@ -151,12 +151,14 @@
         <div class="card" style="margin-top: 30px;"></div>
     </div>
 
-    <!-- Upgraded AI Assistant Button -->
+    <!-- Upgraded AI Assistant Button with new SVG Icon -->
     <button id="ai-fab" onclick="openAIModal()" title="المساعد الذكي">
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect width="20" height="12" x="2" y="12" rx="2"/>
-            <path d="M12 8V4H8V8H6V12h2v4h8v-4h2V12h-2z"/>
-            <path d="M9 18v-2"/><path d="M15 18v-2"/>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="white" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 16.5C16 17.3284 15.3284 18 14.5 18H9.5C8.67157 18 8 17.3284 8 16.5V13.5C8 12.6716 8.67157 12 9.5 12H14.5C15.3284 12 16 12.6716 16 13.5V16.5Z" stroke="white" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 10V8C9 7.44772 9.44772 7 10 7H14C14.5523 7 15 7.44772 15 8V10" stroke="white" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10 15H14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12.5 7V6C12.5 5.72386 12.2761 5.5 12 5.5C11.7239 5.5 11.5 5.72386 11.5 6V7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </button>
 
