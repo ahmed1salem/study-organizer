@@ -66,15 +66,14 @@
         #welcome-message { float: left; margin-top: 10px; font-weight: bold; }
         .close-button { color: #aaa; float: left; font-size: 28px; font-weight: bold; cursor: pointer; }
         
-        /* --- AI Assistant Styles (Upgraded) --- */
+        /* --- AI Assistant Styles (Emoji Version) --- */
         #ai-fab { 
             position: fixed; 
             bottom: 80px; 
             right: 30px; 
-            width: 60px; 
-            height: 60px; 
-            background: linear-gradient(45deg, var(--info-color), var(--primary-color)); 
-            color: white; 
+            width: 70px; 
+            height: 70px; 
+            background: #2596be; 
             border-radius: 50%; 
             border: none; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
@@ -85,15 +84,17 @@
             justify-content: center;
             align-items: center;
             animation: pulse 2.5s infinite;
+            font-size: 2.5em;
+            line-height: 70px;
         }
         #ai-fab:hover { 
             transform: scale(1.1); 
             animation-play-state: paused;
         }
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(23, 162, 184, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(23, 162, 184, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(23, 162, 184, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(37, 150, 190, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(37, 150, 190, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 150, 190, 0); }
         }
 
         #ai-modal .modal-content { max-width: 600px; height: 70vh; display: flex; flex-direction: column; padding: 0; text-align: right; }
@@ -128,7 +129,7 @@
             #welcome-message { display: none; }
             #ai-modal .modal-content { width: 100%; height: 100%; max-width: 100%; margin: 0; border-radius: 0; }
             .site-footer { font-size: 0.8em; }
-            #ai-fab { bottom: 60px; }
+            #ai-fab { bottom: 60px; right: 20px; width: 60px; height: 60px; font-size: 2em; line-height: 60px; }
         }
     </style>
 </head>
@@ -151,16 +152,8 @@
         <div class="card" style="margin-top: 30px;"></div>
     </div>
 
-    <!-- Upgraded AI Assistant Button with new SVG Icon -->
-    <button id="ai-fab" onclick="openAIModal()" title="المساعد الذكي">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="white" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M16 16.5C16 17.3284 15.3284 18 14.5 18H9.5C8.67157 18 8 17.3284 8 16.5V13.5C8 12.6716 8.67157 12 9.5 12H14.5C15.3284 12 16 12.6716 16 13.5V16.5Z" stroke="white" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M9 10V8C9 7.44772 9.44772 7 10 7H14C14.5523 7 15 7.44772 15 8V10" stroke="white" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M10 15H14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M12.5 7V6C12.5 5.72386 12.2761 5.5 12 5.5C11.7239 5.5 11.5 5.72386 11.5 6V7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    </button>
+    <!-- Upgraded AI Assistant Button with Emoji -->
+    <button id="ai-fab" onclick="openAIModal()" title="المساعد الذكي">🤖</button>
 
     <div id="ai-modal" class="modal"></div>
     <div id="quiz-modal" class="modal"></div>
@@ -170,6 +163,7 @@
     </footer>
 
     <script>
+        // !!! هام جداً: استبدل هذا الرابط برابط Web App الجديد الخاص بك !!!
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxRcYjGGXob_7laRhC1Y8lRPmhiosJoSsw8QKD9tJYGhwmphJPWGz6pyiHzkl2hi3oLJw/exec";
 
         let currentUserId, currentUsername, currentSubjectId, currentSubjectName;
