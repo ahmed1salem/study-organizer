@@ -65,14 +65,40 @@
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
         .modal-content { background-color: #fefefe; margin: 10% auto; padding: 30px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 12px; text-align: center; }
         #login-section { max-width: 400px; margin: 50px auto; }
-        #app-section { display: none; padding-bottom: 60px; } /* Add padding for footer */
+        #app-section { display: none; padding-bottom: 60px; }
         #logout-btn { background-color: var(--danger-color); width: auto; padding: 8px 20px; font-size: 0.9em; }
         #welcome-message { float: left; margin-top: 10px; font-weight: bold; }
         .close-button { color: #aaa; float: left; font-size: 28px; font-weight: bold; cursor: pointer; }
         
-        #ai-fab { position: fixed; bottom: 80px; right: 30px; width: 70px; height: 70px; background: #2596be; border-radius: 50%; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; z-index: 999; transition: transform 0.3s ease; display: flex; justify-content: center; align-items: center; animation: pulse 2.5s infinite; font-size: 2.5em; line-height: 70px; }
-        #ai-fab:hover { transform: scale(1.1); animation-play-state: paused; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 150, 190, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(37, 150, 190, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 150, 190, 0); } }
+        #ai-fab { 
+            position: fixed; 
+            bottom: 80px; 
+            right: 30px; 
+            width: 70px; 
+            height: 70px; 
+            background: #2596be; 
+            border-radius: 50%; 
+            border: none; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+            cursor: pointer; 
+            z-index: 999; 
+            transition: transform 0.3s ease; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: pulse 2.5s infinite;
+            font-size: 2.5em;
+            line-height: 70px;
+        }
+        #ai-fab:hover { 
+            transform: scale(1.1); 
+            animation-play-state: paused;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(37, 150, 190, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(37, 150, 190, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 150, 190, 0); }
+        }
         #ai-modal .modal-content { max-width: 600px; height: 70vh; display: flex; flex-direction: column; padding: 0; text-align: right; }
         #ai-modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
         #ai-modal-header h3 { margin: 0; border: none; padding: 0; }
@@ -82,9 +108,10 @@
         .user-bubble { background-color: var(--primary-color); color: white; border-bottom-right-radius: 5px; align-self: flex-start; }
         .ai-bubble { background-color: #e9e9eb; color: var(--font-color); border-bottom-left-radius: 5px; align-self: flex-end; }
         .ai-bubble p:last-child, .ai-bubble ul:last-child { margin-bottom: 0; }
-        #ai-input-container { padding: 15px; border-top: 1px solid var(--border-color); display: flex; gap: 10px; }
-        #ai-input-container input { flex-grow: 1; margin-bottom: 0; }
-        #ai-input-container button { width: auto; border-radius: 8px; }
+        #ai-input-container { padding: 15px; border-top: 1px solid var(--border-color); }
+        #ai-prompt-controls { display: flex; gap: 10px; margin-bottom: 10px; }
+        #ai-prompt-controls input { flex-grow: 1; margin-bottom: 0; }
+        #ai-prompt-controls button { width: auto; border-radius: 8px; }
         .typing-indicator { align-self: flex-end; }
         .typing-indicator span { height: 8px; width: 8px; margin: 0 2px; background-color: #999; border-radius: 50%; display: inline-block; animation: bounce 1.4s infinite ease-in-out both; }
         .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
@@ -143,8 +170,7 @@
     </footer>
 
     <script>
-        // !!! هام جداً: استبدل هذا الرابط برابط Web App الجديد الخاص بك !!!
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-SriGGqgc4Ur2bSSlc-Fv2HBlh8YoLzfqrtnZQhzPy8GZGbXATVtX4iDL6lsQLd_PyA/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxqf_yrs3stOe9kMTf6G6W7yUpvL3qjJiyyqV0HGBXUfvGvsWCHCUkwuQIh2dBk6xtN-A/exec";
 
         let currentUserId, currentUsername, currentSubjectId, currentSubjectName;
         let subjectData = [], flashcardData = [];
@@ -178,16 +204,16 @@
 
         function openAIModal() { 
             document.getElementById('ai-modal').style.display = 'block';
-            document.querySelector('.site-footer').style.display = 'none'; // Hide footer
+            document.querySelector('.site-footer').style.display = 'none';
         }
         function closeAIModal() { 
             document.getElementById('ai-modal').style.display = 'none';
-            document.querySelector('.site-footer').style.display = 'block'; // Show footer
+            document.querySelector('.site-footer').style.display = 'block';
         }
         
         function newAIChat() {
             const chatHistory = document.getElementById('ai-chat-history');
-            chatHistory.innerHTML = ''; // Clear history
+            chatHistory.innerHTML = '';
             const welcomeBubble = document.createElement('div');
             welcomeBubble.className = 'chat-bubble ai-bubble';
             welcomeBubble.textContent = 'أهلاً بك! كيف يمكنني مساعدتك في مذاكرتك اليوم؟';
@@ -199,6 +225,7 @@
             const prompt = promptInput.value.trim();
             if (!prompt) return;
 
+            const isPersonalized = document.getElementById('personalize-toggle').checked;
             const chatHistory = document.getElementById('ai-chat-history');
 
             const userBubble = document.createElement('div');
@@ -215,7 +242,12 @@
             chatHistory.appendChild(typingIndicator);
             chatHistory.scrollTop = chatHistory.scrollHeight;
             
-            const result = await callAppsScript('callGeminiAI', [prompt], false);
+            let result;
+            if (isPersonalized) {
+                result = await callAppsScript('callPersonalizedAI', [currentUserId, prompt], false);
+            } else {
+                result = await callAppsScript('callGeminiAI', [prompt], false);
+            }
             
             chatHistory.removeChild(typingIndicator);
 
@@ -300,8 +332,16 @@
                         <div class="chat-bubble ai-bubble">أهلاً بك! كيف يمكنني مساعدتك في مذاكرتك اليوم؟</div>
                     </div>
                     <div id="ai-input-container">
-                        <input type="text" id="ai-prompt" placeholder="اكتب سؤالك هنا..." onkeydown="if(event.key==='Enter') askAI()">
-                        <button onclick="askAI()">إرسال</button>
+                        <div style="width: 100%; text-align: right; margin-bottom: 10px; font-size: 0.9em;">
+                            <label>
+                                <input type="checkbox" id="personalize-toggle">
+                                تحليل بياناتي وتقديم نصيحة شخصية
+                            </label>
+                        </div>
+                        <div id="ai-prompt-controls">
+                            <input type="text" id="ai-prompt" placeholder="اكتب سؤالك هنا..." onkeydown="if(event.key==='Enter') askAI()">
+                            <button onclick="askAI()">إرسال</button>
+                        </div>
                     </div>
                 </div>`;
             
