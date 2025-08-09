@@ -65,40 +65,15 @@
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
         .modal-content { background-color: #fefefe; margin: 10% auto; padding: 30px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 12px; text-align: center; }
         #login-section { max-width: 400px; margin: 50px auto; }
-        #app-section { display: none; padding-bottom: 60px; }
+        #app-section, #login-section, .site-footer { display: none; }
+        #app-section { padding-bottom: 60px; }
         #logout-btn { background-color: var(--danger-color); width: auto; padding: 8px 20px; font-size: 0.9em; }
         #welcome-message { float: left; margin-top: 10px; font-weight: bold; }
         .close-button { color: #aaa; float: left; font-size: 28px; font-weight: bold; cursor: pointer; }
         
-        #ai-fab { 
-            position: fixed; 
-            bottom: 80px; 
-            right: 30px; 
-            width: 70px; 
-            height: 70px; 
-            background: #2596be; 
-            border-radius: 50%; 
-            border: none; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
-            cursor: pointer; 
-            z-index: 999; 
-            transition: transform 0.3s ease; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: pulse 2.5s infinite;
-            font-size: 2.5em;
-            line-height: 70px;
-        }
-        #ai-fab:hover { 
-            transform: scale(1.1); 
-            animation-play-state: paused;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(37, 150, 190, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(37, 150, 190, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(37, 150, 190, 0); }
-        }
+        #ai-fab { position: fixed; bottom: 80px; right: 30px; width: 70px; height: 70px; background: #2596be; border-radius: 50%; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; z-index: 999; transition: transform 0.3s ease; display: flex; justify-content: center; align-items: center; animation: pulse 2.5s infinite; font-size: 2.5em; line-height: 70px; }
+        #ai-fab:hover { transform: scale(1.1); animation-play-state: paused; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 150, 190, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(37, 150, 190, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 150, 190, 0); } }
         #ai-modal .modal-content { max-width: 600px; height: 70vh; display: flex; flex-direction: column; padding: 0; text-align: right; }
         #ai-modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
         #ai-modal-header h3 { margin: 0; border: none; padding: 0; }
@@ -122,18 +97,67 @@
         .resource-item { background: #fafafa; color: var(--font-color); padding: 15px; margin-bottom: 10px; }
         .resource-item a { color: var(--primary-color); font-weight: bold; text-decoration: none; }
         
-        .site-footer {
+        .site-footer { text-align: center; padding: 20px; margin-top: 40px; color: #6c757d; font-size: 0.9em; }
+        
+        /* --- Landing Page Styles --- */
+        #landing-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
             text-align: center;
             padding: 20px;
-            margin-top: 40px;
-            color: #6c757d;
-            font-size: 0.9em;
+            box-sizing: border-box;
+            background-color: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        #landing-section h1 {
+            font-size: 3.5em;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+        }
+        #landing-section p {
+            font-size: 1.2em;
+            max-width: 700px;
+            margin-bottom: 40px;
+            color: #555;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 900px;
+            margin-bottom: 40px;
+        }
+        .feature-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        .feature-card svg {
+            width: 50px;
+            height: 50px;
+            stroke: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        .feature-card h3 {
+            margin-bottom: 10px;
+            color: var(--primary-dark);
+        }
+        #start-btn {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            width: auto;
         }
 
         @media (max-width: 768px) {
             .main-grid { grid-template-columns: 1fr; }
             .container { padding: 0 10px; }
             header h1 { font-size: 1.8em; }
+            #landing-section h1 { font-size: 2.5em; }
             .card { padding: 15px; }
             #welcome-message { display: none; }
             #ai-modal .modal-content { width: 100%; height: 100%; max-width: 100%; margin: 0; border-radius: 0; }
@@ -144,6 +168,31 @@
 <body>
 
     <div class="loader-overlay" id="loader"></div>
+
+    <div id="landing-section">
+        <h1>حوّل مذاكرتك مع المساعد الذكي</h1>
+        <p>نظّم موادك، أنشئ خططًا ذكية، واختبر نفسك بفعالية. كل أدوات المذاكرة اللي تحتاجها في مكان واحد، مدعومة بالذكاء الاصطناعي لمساعدتك على تحقيق أفضل النتائج.</p>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                <h3>تنظيم المواد</h3>
+                <p>رتب كل موادك بسهولة وحدد أولوياتها عشان تركز على الأهم.</p>
+            </div>
+            <div class="feature-card">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+                <h3>خطط ذكية</h3>
+                <p>احصل على خطة مذاكرة أسبوعية متجددة بناءً على أولوياتك وآخر مرة راجعت فيها.</p>
+            </div>
+            <div class="feature-card">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8V8H6V12h2v4h8v-4h2V12h-2z"/><path d="M9 18v-2"/><path d="M15 18v-2"/></svg>
+                <h3>مساعد شخصي</h3>
+                <p>اسأل الذكاء الاصطناعي عن أي معلومة واحصل على نصايح مخصوصة ليك.</p>
+            </div>
+        </div>
+
+        <button id="start-btn" onclick="showLoginPage()">ابدأ الآن</button>
+    </div>
 
     <div id="login-section" class="container"></div>
 
@@ -200,6 +249,11 @@
             } finally {
                 if (showGlobalLoader) hideLoader();
             }
+        }
+        
+        function showLoginPage() {
+            document.getElementById('landing-section').style.display = 'none';
+            document.getElementById('login-section').style.display = 'block';
         }
 
         function openAIModal() { 
@@ -370,6 +424,7 @@
                 currentUsername = result.username;
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('app-section').style.display = 'block';
+                document.querySelector('.site-footer').style.display = 'block';
                 document.getElementById('welcome-message').textContent = `أهلاً بك، ${currentUsername}`;
                 loadSubjects();
             }
@@ -545,8 +600,6 @@
 
         window.onload = () => {
             renderInitialUI();
-            document.getElementById('app-section').style.display = 'none';
-            document.getElementById('login-section').style.display = 'block';
         };
     </script>
 </body>
