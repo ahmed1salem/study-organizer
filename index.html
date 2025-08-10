@@ -133,37 +133,28 @@
         .ai-tools { position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; }
         .ai-tool-btn { font-size: 0.7em; padding: 4px 8px; width: auto; background-color: var(--info-color); }
         
-        .site-footer {
-            text-align: center;
-            padding: 15px;
-            margin-top: 40px;
-            background-color: #1c1c1c;
-            color: #f0f0f0;
-            font-size: 0.9em;
-        }
-        .dark-mode .site-footer {
-            background-color: #000;
-        }
+        .site-footer { text-align: center; padding: 20px; margin-top: 40px; color: #6c757d; font-size: 0.9em; }
+        .dark-mode .site-footer { color: #adb5bd; }
         
-        #landing-section { flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 20px; box-sizing: border-box; background-color: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px); }
-        #landing-section h1 { font-size: 3.5em; color: var(--primary-dark); margin-bottom: 20px; }
-        #landing-section p { font-size: 1.2em; max-width: 700px; margin-bottom: 40px; color: #555; }
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; max-width: 900px; margin-bottom: 40px; }
+        #landing-section { flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; box-sizing: border-box; background-color: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px); }
+        .hero { padding: 100px 20px; width: 100%; box-sizing: border-box; }
+        .hero h1 { font-size: 3.5em; color: var(--primary-dark); margin-bottom: 20px; }
+        .hero p { font-size: 1.2em; max-width: 700px; margin: 0 auto 40px auto; color: #555; }
+        .landing-content { width: 100%; max-width: 1000px; padding: 40px 20px; box-sizing: border-box; }
+        .section-title { font-size: 2.5em; color: var(--primary-dark); margin-bottom: 40px; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 40px; }
         .feature-card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.5); }
         .feature-card svg { width: 50px; height: 50px; stroke: var(--primary-color); margin-bottom: 15px; }
         .feature-card h3 { margin-bottom: 10px; color: var(--primary-dark); }
-        #start-btn { padding: 15px 40px; font-size: 1.2em; width: auto; }
-        
+        .testimonial { background: var(--card-bg); padding: 30px; border-radius: 12px; margin: 60px 0; font-style: italic; }
+        .testimonial p { font-size: 1.1em; }
+        .testimonial cite { display: block; margin-top: 15px; font-weight: bold; }
+        #start-btn, .cta-btn { padding: 15px 40px; font-size: 1.2em; width: auto; }
+
         #dark-mode-toggle { background: none; border: none; font-size: 1.5em; cursor: pointer; width: auto; padding: 0; }
         .points-display { font-weight: bold; color: var(--success-color); }
         .nav-link { cursor: pointer; text-decoration: underline; color: var(--primary-color); }
         .auth-toggle { text-align: center; margin-top: 15px; }
-        #study-plan-output {
-            background: #e9f5e9; padding: 15px; border-radius: 8px; color: #333;
-        }
-        .dark-mode #study-plan-output {
-            background: #2a4b42; color: #ecf0f1;
-        }
 
         @media (max-width: 768px) {
             .main-grid { grid-template-columns: 1fr; }
@@ -171,7 +162,7 @@
             header h1 { font-size: 1.8em; }
             .header-content { flex-direction: column; gap: 10px; }
             .header-side.right { order: -1; }
-            #landing-section h1 { font-size: 2.5em; }
+            #landing-section h1, .hero h1 { font-size: 2.5em; }
             .card { padding: 15px; }
             #ai-modal .modal-content { width: 100%; height: 100%; max-width: 100%; margin: 0; border-radius: 0; }
             #ai-fab { bottom: 20px; right: 20px; width: 60px; height: 60px; font-size: 2em; line-height: 60px; }
@@ -344,14 +335,24 @@
 
         function renderInitialUI() {
             document.getElementById('landing-section').innerHTML = `
-                <h1>حوّل مذاكرتك مع المساعد الذكي</h1>
-                <p>نظّم موادك، أنشئ خططًا ذكية، واختبر نفسك بفعالية. كل أدوات المذاكرة اللي تحتاجها في مكان واحد، مدعومة بالذكاء الاصطناعي لمساعدتك على تحقيق أفضل النتائج.</p>
-                <div class="features-grid">
-                    <div class="feature-card"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> <h3>تنظيم المواد</h3> <p>رتب كل موادك بسهولة وحدد أولوياتها عشان تركز على الأهم.</p> </div>
-                    <div class="feature-card"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg> <h3>خطط ذكية</h3> <p>احصل على خطة مذاكرة أسبوعية متجددة بناءً على أولوياتك وآخر مرة راجعت فيها.</p> </div>
-                    <div class="feature-card"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8V8H6V12h2v4h8v-4h2V12h-2z"/><path d="M9 18v-2"/><path d="M15 18v-2"/></svg> <h3>مساعد شخصي</h3> <p>اسأل الذكاء الاصطناعي عن أي معلومة واحصل على نصايح مخصوصة ليك.</p> </div>
+                <div class="hero">
+                    <h1>حوّل مذاكرتك مع المساعد الذكي</h1>
+                    <p>نظّم موادك، أنشئ خططًا ذكية، واختبر نفسك بفعالية. كل أدوات المذاكرة اللي تحتاجها في مكان واحد، مدعومة بالذكاء الاصطناعي لمساعدتك على تحقيق أفضل النتائج.</p>
+                    <button id="start-btn" onclick="navigateTo('login')">ابدأ الآن مجاناً</button>
                 </div>
-                <button id="start-btn" onclick="navigateTo('login')">ابدأ الآن</button>`;
+                <div class="landing-content">
+                    <h2 class="section-title">إزاي بيشتغل؟</h2>
+                    <div class="features-grid">
+                        <div class="feature-card"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> <h3>1. أضف موادك</h3> <p>ابدأ بإضافة المواد الدراسية وحدد أولويتها عشان تركز على الأهم.</p> </div>
+                        <div class="feature-card"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg> <h3>2. احصل على خطة</h3> <p>بضغطة زر، احصل على خطة مذاكرة أسبوعية ذكية بناءً على أولوياتك وآخر مراجعة.</p> </div>
+                        <div class="feature-card"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8V8H6V12h2v4h8v-4h2V12h-2z"/><path d="M9 18v-2"/><path d="M15 18v-2"/></svg> <h3>3. ذاكر بذكاء</h3> <p>استخدم المساعد الذكي لشرح المفاهيم الصعبة وإنشاء بطاقات مراجعة تلقائيًا.</p> </div>
+                    </div>
+                    <div class="testimonial">
+                        <p>"الموقع ده غير طريقة مذاكرتي تمامًا. الخطة الذكية والمساعد الشخصي ساعدوني أركز على الحاجات المهمة بجد."</p>
+                        <cite>- طالب جامعي</cite>
+                    </div>
+                    <button class="cta-btn" onclick="navigateTo('login')">انضم الآن وابدأ المذاكرة بذكاء</button>
+                </div>`;
 
             document.getElementById('login-section').innerHTML = `
                 <div class="card">
