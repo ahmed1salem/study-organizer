@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مُنظِّم المذاكرة الذكي</title>
-    <!-- Font: Tajawal -->
+    
+    <meta name="description" content="حوّل مذاكرتك مع مُنظِّم المذاكرة الذكي! أداة مجانية لتنظيم المواد الدراسية، إنشاء خطط ذكية أسبوعية، وصنع بطاقات تعليمية فعالة. احصل على نصائح شخصية من المساعد الذكي وتابع تقدمك بسهولة لتحقيق أفضل النتائج.">
+
+    <link rel="icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEipSyzskLTjBJQ7eGegZ-UaWo9-z1NgpDByEcnYfkNibq_yV8vDdPJUlJ3376WSR0aqns6RQPZg-S9bOJOFhK7WGObfhd08Rbi-3MA8P2TcOA63Y3mOGQUBMkZx-RButZJH3ntSNZ97Q-fycfUsRNCy0JD5CMfie3oTmfemrGEnjMZG3Hk-9hoG94yIwEk/s500/Study%20organizer%20no%20bg.png" type="image/png">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Library to render AI response formatting -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
     <style>
@@ -133,8 +136,16 @@
         .ai-tools { position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; }
         .ai-tool-btn { font-size: 0.7em; padding: 4px 8px; width: auto; background-color: var(--info-color); }
         
-        .site-footer { text-align: center; padding: 20px; margin-top: 40px; color: #6c757d; font-size: 0.9em; }
-        .dark-mode .site-footer { color: #adb5bd; }
+        .site-footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #1c1c1c;
+            color: #f0f0f0;
+            font-size: 0.9em;
+        }
+        .dark-mode .site-footer {
+            background-color: #000;
+        }
         
         #landing-section { flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; box-sizing: border-box; background-color: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px); }
         .hero { padding: 100px 20px; width: 100%; box-sizing: border-box; }
@@ -150,7 +161,7 @@
         .testimonial p { font-size: 1.1em; }
         .testimonial cite { display: block; margin-top: 15px; font-weight: bold; }
         #start-btn, .cta-btn { padding: 15px 40px; font-size: 1.2em; width: auto; }
-
+        
         #dark-mode-toggle { background: none; border: none; font-size: 1.5em; cursor: pointer; width: auto; padding: 0; }
         .points-display { font-weight: bold; color: var(--success-color); }
         .nav-link { cursor: pointer; text-decoration: underline; color: var(--primary-color); }
