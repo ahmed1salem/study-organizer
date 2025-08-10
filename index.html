@@ -38,6 +38,7 @@
         .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
         header { text-align: center; margin-bottom: 40px; padding: 20px; background-color: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow); position: relative; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.5); }
         header h1 { color: var(--primary-color); font-size: 2.5em; margin: 0; font-weight: 700; }
+        .header-controls { display: flex; justify-content: space-between; align-items: center; position: absolute; top: 20px; left: 20px; width: calc(100% - 40px); }
         .main-grid { display: grid; grid-template-columns: 300px 1fr; gap: 30px; align-items: start; }
         .card { 
             background-color: var(--card-bg); 
@@ -57,6 +58,7 @@
         input, textarea, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; box-sizing: border-box; background-color: var(--secondary-color); color: var(--font-color); }
         button { background-color: var(--primary-color); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: 700; width: 100%; transition: all 0.3s ease; }
         button:hover { background-color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        button:disabled { background-color: #999; cursor: not-allowed; transform: none; box-shadow: none; }
         #subjects-list { list-style-type: none; padding: 0; max-height: 400px; overflow-y: auto; }
         #subjects-list li { padding: 15px; background-color: var(--secondary-color); margin-bottom: 10px; border-radius: 8px; cursor: pointer; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
         #subjects-list li.active, #subjects-list li:hover { background-color: var(--primary-color); color: white; }
@@ -73,7 +75,7 @@
         #app-section, #login-section, #landing-section { display: none; }
         #app-section { padding-bottom: 60px; }
         #logout-btn { background-color: var(--danger-color); width: auto; padding: 8px 20px; font-size: 0.9em; }
-        #welcome-message { float: left; margin-top: 10px; font-weight: bold; }
+        #welcome-message { font-weight: bold; }
         .close-button { color: #aaa; float: left; font-size: 28px; font-weight: bold; cursor: pointer; }
         
         #ai-fab { position: fixed; bottom: 80px; right: 30px; width: 70px; height: 70px; background: #2596be; border-radius: 50%; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; z-index: 999; transition: transform 0.3s ease; display: flex; justify-content: center; align-items: center; animation: pulse 2.5s infinite; font-size: 2.5em; line-height: 70px; }
@@ -115,7 +117,7 @@
         .feature-card h3 { margin-bottom: 10px; color: var(--primary-dark); }
         #start-btn { padding: 15px 40px; font-size: 1.2em; width: auto; }
         
-        #dark-mode-toggle { position: absolute; top: 20px; left: 20px; background: none; border: none; font-size: 1.5em; cursor: pointer; width: auto; }
+        #dark-mode-toggle { background: none; border: none; font-size: 1.5em; cursor: pointer; width: auto; padding: 0; }
         .points-display { font-weight: bold; color: var(--success-color); }
         .nav-link { cursor: pointer; text-decoration: underline; color: var(--primary-color); }
 
@@ -123,9 +125,10 @@
             .main-grid { grid-template-columns: 1fr; }
             .container { padding: 0 10px; }
             header h1 { font-size: 1.8em; }
+            .header-controls { position: static; flex-direction: column-reverse; gap: 15px; }
             #landing-section h1 { font-size: 2.5em; }
             .card { padding: 15px; }
-            #welcome-message { display: none; }
+            #welcome-message { display: block; text-align: center; float: none; }
             #ai-modal .modal-content { width: 100%; height: 100%; max-width: 100%; margin: 0; border-radius: 0; }
             #ai-fab { bottom: 20px; right: 20px; width: 60px; height: 60px; font-size: 2em; line-height: 60px; }
         }
@@ -180,7 +183,7 @@
             }
         }
         
-        const sections = ['landing-section', 'login-section', 'app-section', 'progress-section'];
+        const sections = ['landing-section', 'login-section', 'app-section', 'progress-modal'];
         const footer = document.querySelector('.site-footer');
         const aiFab = document.getElementById('ai-fab');
 
@@ -191,8 +194,9 @@
         function router() {
             const path = window.location.hash.slice(1) || 'home';
             
-            document.querySelectorAll('#landing-section, #login-section, #app-section, #progress-modal').forEach(el => {
-                if(el) el.style.display = 'none';
+            sections.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
             });
 
             if (footer) footer.style.display = 'none';
@@ -209,7 +213,7 @@
                     aiFab.style.display = 'flex';
                     const welcomeEl = document.getElementById('welcome-message');
                     if (welcomeEl && !welcomeEl.textContent) {
-                        document.getElementById('welcome-message').textContent = `أهلاً بك، ${currentUsername} | <span class="points-display"></span>`;
+                        welcomeEl.innerHTML = `أهلاً بك، ${currentUsername} | <span class="points-display"></span>`;
                         loadSubjects();
                         updateUserPointsDisplay();
                     }
@@ -219,6 +223,7 @@
             } else if (path === 'progress') {
                  if (localStorage.getItem('userId')) {
                     document.getElementById('progress-modal').style.display = 'block';
+                    showProgressPage();
                  } else {
                     navigateTo('login');
                  }
@@ -312,10 +317,10 @@
             const appSection = document.getElementById('app-section');
             appSection.innerHTML = `
                 <header>
-                    <button id="dark-mode-toggle" onclick="toggleDarkMode()">☀️</button>
-                    <div style="overflow: hidden;">
+                    <div class="header-controls">
+                        <button id="dark-mode-toggle" onclick="toggleDarkMode()">☀️</button>
                         <span id="welcome-message"></span>
-                        <button id="logout-btn" onclick="logout()" style="float: right;">تسجيل الخروج</button>
+                        <button id="logout-btn" onclick="logout()">تسجيل الخروج</button>
                     </div>
                     <h1>🎓 مُنظِّم المذاكرة الذكي</h1>
                 </header>
@@ -402,8 +407,8 @@
                         <p id="quiz-answer" style="display:none;"></p>
                     </div>
                     <div class="quiz-controls" style="display:none;">
-                        <button class="dont-know-btn" onclick="handleQuizResponse('Learning')">لا أعرفها</button>
-                        <button class="know-btn" onclick="handleQuizResponse('Mastered')">أعرفها</button>
+                        <button class="dont-know-btn" onclick="handleQuizResponse('Learning', this)">لا أعرفها</button>
+                        <button class="know-btn" onclick="handleQuizResponse('Mastered', this)">أعرفها</button>
                     </div>
                 </div>`;
             
@@ -573,7 +578,7 @@
                 generatedCards.forEach(c => {
                     cardsHtml += `<li><strong>س:</strong> ${c.question} <strong>ج:</strong> ${c.answer}</li>`;
                 });
-                cardsHtml += '</ul><button class="ai-tool-btn" onclick="addGeneratedCards()">نعم، أضفهم للمادة</button>';
+                cardsHtml += '</ul><button id="add-gen-cards-btn" class="ai-tool-btn" onclick="addGeneratedCards(this)">نعم، أضفهم للمادة</button>';
                 aiBubble.innerHTML = cardsHtml;
             } else {
                 aiBubble.textContent = "لم أتمكن من إنشاء بطاقات من هذا النص.";
@@ -582,20 +587,34 @@
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
-        async function addGeneratedCards() {
+        async function addGeneratedCards(button) {
             if (!tempGeneratedCards) return;
+            
+            button.disabled = true;
+            button.textContent = 'جاري الإضافة...';
+
+            const chatHistory = document.getElementById('ai-chat-history');
+            const loadingBubble = document.createElement('div');
+            loadingBubble.className = 'chat-bubble ai-bubble';
+            loadingBubble.textContent = 'جاري حفظ البطاقات في قاعدة البيانات...';
+            chatHistory.appendChild(loadingBubble);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
             for (const card of tempGeneratedCards) {
                 await callAppsScript('addFlashcard', [currentUserId, currentSubjectId, card.question, card.answer], false);
             }
             tempGeneratedCards = null;
-            loadFlashcards();
-            updateUserPointsDisplay();
-            const chatHistory = document.getElementById('ai-chat-history');
+
+            chatHistory.removeChild(loadingBubble);
+            
             const confirmationBubble = document.createElement('div');
             confirmationBubble.className = 'chat-bubble ai-bubble';
             confirmationBubble.textContent = 'تمت إضافة البطاقات بنجاح!';
             chatHistory.appendChild(confirmationBubble);
             chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            loadFlashcards();
+            updateUserPointsDisplay();
         }
 
         async function addResource() {
@@ -719,11 +738,20 @@
             quizModal.querySelector('#quiz-answer').style.display = 'block';
             quizModal.querySelector('.quiz-controls').style.display = 'flex';
         }
-        async function handleQuizResponse(status) {
+        async function handleQuizResponse(status, button) {
+            const controls = button.parentElement;
+            controls.querySelectorAll('button').forEach(btn => btn.disabled = true);
+            button.textContent = 'جاري...';
+
             const card = quizFlashcards[currentCardIndex];
-            await callAppsScript('updateFlashcardStatus', [currentUserId, card.id, status]);
+            await callAppsScript('updateFlashcardStatus', [currentUserId, card.id, status], false);
+            
             updateUserPointsDisplay();
             currentCardIndex++;
+
+            controls.querySelectorAll('button').forEach(btn => btn.disabled = false);
+            button.textContent = button.classList.contains('know-btn') ? 'أعرفها' : 'لا أعرفها';
+
             if (currentCardIndex >= quizFlashcards.length) {
                 alert('لقد أكملت جولة المراجعة الحالية!');
                 closeQuiz();
