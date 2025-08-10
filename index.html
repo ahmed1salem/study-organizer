@@ -18,6 +18,10 @@
             --shadow: 0 4px 12px rgba(0,0,0,0.08); --success-color: #28a745;
             --danger-color: #dc3545; --warning-color: #ffc107; --info-color: #17a2b8;
         }
+        .dark-mode {
+            --secondary-color: #2c3e50; --font-color: #ecf0f1; --border-color: #34495e;
+            --card-bg: rgba(44, 62, 80, 0.85);
+        }
         body { 
             font-family: 'Tajawal', sans-serif; 
             margin: 0; 
@@ -29,6 +33,7 @@
             background-color: #f8f9fa;
             color: var(--font-color); 
             line-height: 1.7; 
+            transition: background-color 0.3s, color 0.3s;
         }
         .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
         header { text-align: center; margin-bottom: 40px; padding: 20px; background-color: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow); position: relative; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.5); }
@@ -49,7 +54,7 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         }
         .card h2, .card h3 { margin-top: 0; color: var(--primary-dark); border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; margin-bottom: 20px; font-weight: 700; }
-        input, textarea, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; box-sizing: border-box; }
+        input, textarea, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; box-sizing: border-box; background-color: var(--secondary-color); color: var(--font-color); }
         button { background-color: var(--primary-color); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: 700; width: 100%; transition: all 0.3s ease; }
         button:hover { background-color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
         #subjects-list { list-style-type: none; padding: 0; max-height: 400px; overflow-y: auto; }
@@ -63,9 +68,9 @@
         .loader { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 8px solid #f3f3f3; border-top: 8px solid var(--primary-color); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
-        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 30px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 12px; text-align: center; }
+        .modal-content { background-color: var(--card-bg); backdrop-filter: blur(5px); margin: 10% auto; padding: 30px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 12px; text-align: center; }
         #login-section { max-width: 400px; margin: 50px auto; }
-        #app-section, #login-section, #landing-section { display: none; } /* All sections hidden by default */
+        #app-section, #login-section, #landing-section { display: none; }
         #app-section { padding-bottom: 60px; }
         #logout-btn { background-color: var(--danger-color); width: auto; padding: 8px 20px; font-size: 0.9em; }
         #welcome-message { float: left; margin-top: 10px; font-weight: bold; }
@@ -94,8 +99,10 @@
         @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
 
         .flashcard-status, .resource-item { font-size: 0.8em; padding: 3px 8px; border-radius: 12px; color: white; }
-        .resource-item { background: #fafafa; color: var(--font-color); padding: 15px; margin-bottom: 10px; }
+        .resource-item { background: #fafafa; color: var(--font-color); padding: 15px; margin-bottom: 10px; position: relative; }
         .resource-item a { color: var(--primary-color); font-weight: bold; text-decoration: none; }
+        .ai-tools { position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; }
+        .ai-tool-btn { font-size: 0.7em; padding: 4px 8px; width: auto; background-color: var(--info-color); }
         
         .site-footer { text-align: center; padding: 20px; margin-top: 40px; color: #6c757d; font-size: 0.9em; }
         
@@ -107,6 +114,9 @@
         .feature-card svg { width: 50px; height: 50px; stroke: var(--primary-color); margin-bottom: 15px; }
         .feature-card h3 { margin-bottom: 10px; color: var(--primary-dark); }
         #start-btn { padding: 15px 40px; font-size: 1.2em; width: auto; }
+        
+        #dark-mode-toggle { position: absolute; top: 20px; left: 20px; background: none; border: none; font-size: 1.5em; cursor: pointer; width: auto; }
+        .points-display { font-weight: bold; color: var(--success-color); }
 
         @media (max-width: 768px) {
             .main-grid { grid-template-columns: 1fr; }
@@ -124,60 +134,22 @@
 
     <div class="loader-overlay" id="loader"></div>
 
-    <div id="landing-section">
-        <h1>حوّل مذاكرتك مع المساعد الذكي</h1>
-        <p>نظّم موادك، أنشئ خططًا ذكية، واختبر نفسك بفعالية. كل أدوات المذاكرة اللي تحتاجها في مكان واحد، مدعومة بالذكاء الاصطناعي لمساعدتك على تحقيق أفضل النتائج.</p>
-        
-        <div class="features-grid">
-            <div class="feature-card">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                <h3>تنظيم المواد</h3>
-                <p>رتب كل موادك بسهولة وحدد أولوياتها عشان تركز على الأهم.</p>
-            </div>
-            <div class="feature-card">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
-                <h3>خطط ذكية</h3>
-                <p>احصل على خطة مذاكرة أسبوعية متجددة بناءً على أولوياتك وآخر مرة راجعت فيها.</p>
-            </div>
-            <div class="feature-card">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8V8H6V12h2v4h8v-4h2V12h-2z"/><path d="M9 18v-2"/><path d="M15 18v-2"/></svg>
-                <h3>مساعد شخصي</h3>
-                <p>اسأل الذكاء الاصطناعي عن أي معلومة واحصل على نصايح مخصوصة ليك.</p>
-            </div>
-        </div>
-
-        <button id="start-btn" onclick="navigateTo('login')">ابدأ الآن</button>
-    </div>
-
+    <div id="landing-section"></div>
     <div id="login-section" class="container"></div>
-
-    <div id="app-section" class="container">
-        <header>
-            <div style="overflow: hidden;">
-                <span id="welcome-message"></span>
-                <button id="logout-btn" onclick="logout()" style="float: right;">تسجيل الخروج</button>
-            </div>
-            <h1>🎓 مُنظِّم المذاكرة الذكي</h1>
-        </header>
-
-        <div class="main-grid"></div>
-        <div class="card" style="margin-top: 30px;"></div>
-    </div>
-
-    <button id="ai-fab" onclick="openAIModal()" title="المساعد الذكي">🤖</button>
-
+    <div id="app-section" class="container"></div>
     <div id="ai-modal" class="modal"></div>
     <div id="quiz-modal" class="modal"></div>
-
+    <div id="progress-modal" class="modal"></div>
+    <button id="ai-fab" onclick="openAIModal()" title="المساعد الذكي">🤖</button>
     <footer class="site-footer">
         جميع الحقوق محفوظة لفريق العقول الرقمية بقيادة أحمد سالم
     </footer>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzs7jt_BgUfFdOZ7PkO51noiSf2wmNiugTAriB8YYnA2DAghiq3pKEXhrQyxtUMcshsA/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpX7l1UJ1akuhxcDp5WJoS7LtKd6VqOQQ-BmyAStTWKucbUte-PKgQqsGPuwX6ZsDRpw/exec";
 
         let currentUserId, currentUsername, currentSubjectId, currentSubjectName;
-        let subjectData = [], flashcardData = [];
+        let subjectData = [], flashcardData = [], resourcesData = [];
 
         const loader = document.getElementById('loader');
         const showLoader = () => loader.style.display = 'block';
@@ -206,9 +178,9 @@
             }
         }
         
-        // --- New Client-Side Router ---
         const sections = ['landing-section', 'login-section', 'app-section'];
         const footer = document.querySelector('.site-footer');
+        const aiFab = document.getElementById('ai-fab');
 
         function navigateTo(path) {
             window.location.hash = path;
@@ -218,45 +190,48 @@
             const path = window.location.hash.slice(1) || 'home';
             
             sections.forEach(id => {
-                document.getElementById(id).style.display = 'none';
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
             });
-            footer.style.display = 'none';
 
-            switch(path) {
-                case 'login':
-                    document.getElementById('login-section').style.display = 'block';
-                    break;
-                case 'dashboard':
-                    // Check if user is actually logged in
-                    if (currentUserId) {
-                        document.getElementById('app-section').style.display = 'block';
-                        footer.style.display = 'block';
-                    } else {
-                        // If not logged in, redirect to login
-                        navigateTo('login');
+            if (footer) footer.style.display = 'none';
+            if (aiFab) aiFab.style.display = 'none';
+
+            if (path === 'login') {
+                const el = document.getElementById('login-section');
+                if (el) el.style.display = 'block';
+            } else if (path === 'dashboard') {
+                if (localStorage.getItem('userId')) {
+                    currentUserId = localStorage.getItem('userId');
+                    currentUsername = localStorage.getItem('username');
+                    const appEl = document.getElementById('app-section');
+                    if (appEl) appEl.style.display = 'block';
+                    if (footer) footer.style.display = 'block';
+                    if (aiFab) aiFab.style.display = 'flex';
+                    const welcomeEl = document.getElementById('welcome-message');
+                    if (welcomeEl && !welcomeEl.textContent) {
+                        document.getElementById('welcome-message').textContent = `أهلاً بك، ${currentUsername}`;
+                        loadSubjects();
+                        updateUserPointsDisplay();
                     }
-                    break;
-                case 'home':
-                default:
-                    document.getElementById('landing-section').style.display = 'flex';
-                    break;
+                } else {
+                    navigateTo('login');
+                }
+            } else {
+                const el = document.getElementById('landing-section');
+                if (el) el.style.display = 'flex';
             }
         }
 
-        // --- Event Listeners for Router ---
         window.addEventListener('hashchange', router);
-        window.addEventListener('load', () => {
-            renderInitialUI();
-            router(); // Initial route check
-        });
-
+        
         function openAIModal() { 
             document.getElementById('ai-modal').style.display = 'block';
-            footer.style.display = 'none';
+            if(footer) footer.style.display = 'none';
         }
         function closeAIModal() { 
             document.getElementById('ai-modal').style.display = 'none';
-            if (currentUserId) footer.style.display = 'block';
+            if (currentUserId && footer) footer.style.display = 'block';
         }
         
         function newAIChat() {
@@ -311,6 +286,16 @@
         }
 
         function renderInitialUI() {
+            document.getElementById('landing-section').innerHTML = `
+                <h1>حوّل مذاكرتك مع المساعد الذكي</h1>
+                <p>نظّم موادك، أنشئ خططًا ذكية، واختبر نفسك بفعالية. كل أدوات المذاكرة اللي تحتاجها في مكان واحد، مدعومة بالذكاء الاصطناعي لمساعدتك على تحقيق أفضل النتائج.</p>
+                <div class="features-grid">
+                    <div class="feature-card"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> <h3>تنظيم المواد</h3> <p>رتب كل موادك بسهولة وحدد أولوياتها عشان تركز على الأهم.</p> </div>
+                    <div class="feature-card"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg> <h3>خطط ذكية</h3> <p>احصل على خطة مذاكرة أسبوعية متجددة بناءً على أولوياتك وآخر مرة راجعت فيها.</p> </div>
+                    <div class="feature-card"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8V8H6V12h2v4h8v-4h2V12h-2z"/><path d="M9 18v-2"/><path d="M15 18v-2"/></svg> <h3>مساعد شخصي</h3> <p>اسأل الذكاء الاصطناعي عن أي معلومة واحصل على نصايح مخصوصة ليك.</p> </div>
+                </div>
+                <button id="start-btn" onclick="navigateTo('login')">ابدأ الآن</button>`;
+
             document.getElementById('login-section').innerHTML = `
                 <div class="card">
                     <h2 style="text-align: center;">تسجيل الدخول</h2>
@@ -321,53 +306,63 @@
                 </div>`;
             
             const appSection = document.getElementById('app-section');
-            appSection.querySelector('.main-grid').innerHTML = `
-                <div class="card">
-                    <h2>المواد الدراسية</h2>
-                    <div id="add-subject-form">
-                        <input type="text" id="subject-name-input" placeholder="اسم المادة الجديدة">
-                        <select id="subject-priority-select">
-                            <option value="High">أولوية عالية</option>
-                            <option value="Medium" selected>أولوية متوسطة</option>
-                            <option value="Low">أولوية منخفضة</option>
-                        </select>
-                        <button onclick="addSubject()">إضافة مادة</button>
+            appSection.innerHTML = `
+                <header>
+                    <button id="dark-mode-toggle" onclick="toggleDarkMode()">☀️</button>
+                    <div style="overflow: hidden;">
+                        <span id="welcome-message"></span>
+                        <button id="logout-btn" onclick="logout()" style="float: right;">تسجيل الخروج</button>
                     </div>
-                    <ul id="subjects-list" style="margin-top: 20px;"></ul>
-                </div>
-                <div id="main-content" style="display: none;">
+                    <h1>🎓 مُنظِّم المذاكرة الذكي</h1>
+                </header>
+                <div class="main-grid">
                     <div class="card">
-                        <h2 id="current-subject-title">اختر مادة للبدء</h2>
-                        <div id="resource-library">
-                            <h3>📚 مكتبة الموارد</h3>
-                            <div id="resources-list"></div>
-                            <h4>إضافة مورد جديد:</h4>
-                            <input type="text" id="resource-title-input" placeholder="عنوان المورد">
-                            <select id="resource-type-select">
-                                <option value="youtube">رابط يوتيوب</option>
-                                <option value="link">رابط موقع/ملف</option>
-                                <option value="note">ملاحظة نصية</option>
+                        <h2>المواد الدراسية</h2>
+                        <div id="add-subject-form">
+                            <input type="text" id="subject-name-input" placeholder="اسم المادة الجديدة">
+                            <select id="subject-priority-select">
+                                <option value="High">أولوية عالية</option>
+                                <option value="Medium" selected>أولوية متوسطة</option>
+                                <option value="Low">أولوية منخفضة</option>
                             </select>
-                            <textarea id="resource-content-input" placeholder="ضع الرابط هنا أو اكتب ملاحظتك" rows="3"></textarea>
-                            <button onclick="addResource()">إضافة المورد</button>
+                            <button onclick="addSubject()">إضافة مادة</button>
                         </div>
-                        <hr style="margin: 40px 0; border: 1px solid var(--border-color);">
-                        <div id="flashcard-maker">
-                            <h3>🃏 البطاقات التعليمية <button id="start-quiz-btn" class="success" style="display: inline-block; width: auto; float: left; padding: 8px 15px; font-size: 0.8em;" onclick="startQuiz()">بدء الاختبار الذكي</button></h3>
-                            <div id="flashcards-list"></div>
-                            <h4>إنشاء بطاقة جديدة:</h4>
-                            <input type="text" id="flashcard-question-input" placeholder="اكتب السؤال هنا">
-                            <textarea id="flashcard-answer-input" placeholder="اكتب الجواب هنا" rows="2"></textarea>
-                            <button onclick="addFlashcard()">إضافة بطاقة</button>
+                        <ul id="subjects-list" style="margin-top: 20px;"></ul>
+                    </div>
+                    <div id="main-content" style="display: none;">
+                        <div class="card">
+                            <h2 id="current-subject-title">اختر مادة للبدء</h2>
+                            <div id="resource-library">
+                                <h3>📚 مكتبة الموارد</h3>
+                                <div id="resources-list"></div>
+                                <h4>إضافة مورد جديد:</h4>
+                                <input type="text" id="resource-title-input" placeholder="عنوان المورد">
+                                <select id="resource-type-select">
+                                    <option value="youtube">رابط يوتيوب</option>
+                                    <option value="link">رابط موقع/ملف</option>
+                                    <option value="note">ملاحظة نصية</option>
+                                </select>
+                                <textarea id="resource-content-input" placeholder="ضع الرابط هنا أو اكتب ملاحظتك" rows="3"></textarea>
+                                <button onclick="addResource()">إضافة المورد</button>
+                            </div>
+                            <hr style="margin: 40px 0; border: 1px solid var(--border-color);">
+                            <div id="flashcard-maker">
+                                <h3>🃏 البطاقات التعليمية <button id="start-quiz-btn" class="success" style="display: inline-block; width: auto; float: left; padding: 8px 15px; font-size: 0.8em;" onclick="startQuiz()">بدء الاختبار الذكي</button></h3>
+                                <div id="flashcards-list"></div>
+                                <h4>إنشاء بطاقة جديدة:</h4>
+                                <input type="text" id="flashcard-question-input" placeholder="اكتب السؤال هنا">
+                                <textarea id="flashcard-answer-input" placeholder="اكتب الجواب هنا" rows="2"></textarea>
+                                <button onclick="addFlashcard()">إضافة بطاقة</button>
+                            </div>
                         </div>
                     </div>
+                </div>
+                <div class="card" style="margin-top: 30px;">
+                    <h2>📅 مولد الخطة الدراسية فائق الذكاء</h2>
+                    <p>يقوم بإنشاء خطة أسبوعية بناءً على أولوية المواد وآخر مرة تمت مراجعتها.</p>
+                    <button onclick="generateSmartStudyPlan()" class="success" style="margin-top: 10px;">توليد خطة ذكية</button>
+                    <div id="study-plan-output" style="margin-top: 20px; background: #e9f5e9; padding: 15px; border-radius: 8px;"></div>
                 </div>`;
-            
-            appSection.querySelector('.card[style*="margin-top"]').innerHTML = `
-                <h2>📅 مولد الخطة الدراسية فائق الذكاء</h2>
-                <p>يقوم بإنشاء خطة أسبوعية بناءً على أولوية المواد وآخر مرة تمت مراجعتها.</p>
-                <button onclick="generateSmartStudyPlan()" class="success" style="margin-top: 10px;">توليد خطة ذكية</button>
-                <div id="study-plan-output" style="margin-top: 20px; background: #e9f5e9; padding: 15px; border-radius: 8px;"></div>`;
             
             document.getElementById('ai-modal').innerHTML = `
                 <div class="modal-content">
@@ -414,18 +409,18 @@
             if (!username || !password) return alert('الرجاء إدخال اسم المستخدم وكلمة المرور.');
             const result = await callAppsScript('loginUser', [username, password]);
             if (result && result.userId) {
-                currentUserId = result.userId;
-                currentUsername = result.username;
-                document.getElementById('welcome-message').textContent = `أهلاً بك، ${currentUsername}`;
-                loadSubjects();
+                localStorage.setItem('userId', result.userId);
+                localStorage.setItem('username', result.username);
                 navigateTo('dashboard');
             }
         }
 
         function logout() { 
+            localStorage.removeItem('userId');
+            localStorage.removeItem('username');
             currentUserId = null;
             currentUsername = null;
-            navigateTo('home');
+            navigateTo(''); 
         }
         
         async function loadSubjects() {
@@ -467,9 +462,26 @@
 
         async function loadResources() {
             if (!currentUserId || !currentSubjectId) return;
-            const resources = await callAppsScript('getResources', [currentUserId, currentSubjectId]);
+            resourcesData = await callAppsScript('getResources', [currentUserId, currentSubjectId]) || [];
             const list = document.getElementById('resources-list');
             list.innerHTML = '';
+            
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'ابحث في الموارد...';
+            searchInput.onkeyup = () => filterResources(searchInput.value);
+            list.appendChild(searchInput);
+
+            const resourcesContainer = document.createElement('div');
+            resourcesContainer.id = 'resources-container';
+            list.appendChild(resourcesContainer);
+            
+            renderResources(resourcesData);
+        }
+
+        function renderResources(resources) {
+            const container = document.getElementById('resources-container');
+            container.innerHTML = '';
             if (resources && resources.length > 0) {
                 resources.forEach(res => {
                     const div = document.createElement('div');
@@ -477,14 +489,51 @@
                     let contentHTML = `<strong>${res.title} (${res.type === 'youtube' ? 'يوتيوب' : (res.type === 'link' ? 'رابط' : 'ملاحظة')}):</strong>`;
                     if (res.type === 'note') {
                         contentHTML += `<p style="margin-top: 5px;">${res.content.replace(/\n/g, '<br>')}</p>`;
+                        contentHTML += `<div class="ai-tools">
+                            <button class="ai-tool-btn" onclick="summarizeNote('${res.id}')">لخصلي</button>
+                            <button class="ai-tool-btn" onclick="generateFlashcards('${res.id}')">حوّل لبطاقات</button>
+                        </div>`;
                     } else {
                         contentHTML += ` <a href="${res.content}" target="_blank">فتح المصدر</a>`;
                     }
                     div.innerHTML = contentHTML;
-                    list.appendChild(div);
+                    container.appendChild(div);
                 });
             } else {
-                list.innerHTML = '<p>لا توجد موارد لهذه المادة بعد.</p>';
+                container.innerHTML = '<p>لا توجد موارد لهذه المادة بعد.</p>';
+            }
+        }
+
+        function filterResources(term) {
+            const filtered = resourcesData.filter(r => 
+                r.title.toLowerCase().includes(term.toLowerCase()) || 
+                r.content.toLowerCase().includes(term.toLowerCase())
+            );
+            renderResources(filtered);
+        }
+
+        async function summarizeNote(resourceId) {
+            const resource = resourcesData.find(r => r.id === resourceId);
+            if (!resource) return;
+            const summary = await callAppsScript('summarizeText', [resource.content]);
+            if (summary) {
+                alert("ملخص الملاحظة:\n\n" + summary);
+            }
+        }
+
+        async function generateFlashcards(resourceId) {
+            const resource = resourcesData.find(r => r.id === resourceId);
+            if (!resource) return;
+            const generatedCards = await callAppsScript('generateFlashcardsFromText', [resource.content]);
+            if (generatedCards && generatedCards.length > 0) {
+                if (confirm(`تم إنشاء ${generatedCards.length} بطاقة. هل تريد إضافتهم؟`)) {
+                    for (const card of generatedCards) {
+                        await callAppsScript('addFlashcard', [currentUserId, currentSubjectId, card.question, card.answer], false);
+                    }
+                    loadFlashcards(); // Refresh list
+                }
+            } else {
+                alert("لم أتمكن من إنشاء بطاقات من هذا النص.");
             }
         }
 
@@ -594,9 +643,24 @@
             displayQuizCard();
         }
 
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const toggle = document.getElementById('dark-mode-toggle');
+            if (document.body.classList.contains('dark-mode')) {
+                toggle.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                toggle.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
         window.onload = () => {
             renderInitialUI();
             router();
+            if (localStorage.getItem('theme') === 'dark') {
+                toggleDarkMode();
+            }
         };
     </script>
 </body>
