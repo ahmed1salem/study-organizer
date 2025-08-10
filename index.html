@@ -117,6 +117,7 @@
         
         #dark-mode-toggle { position: absolute; top: 20px; left: 20px; background: none; border: none; font-size: 1.5em; cursor: pointer; width: auto; }
         .points-display { font-weight: bold; color: var(--success-color); }
+        .nav-link { cursor: pointer; text-decoration: underline; color: var(--primary-color); }
 
         @media (max-width: 768px) {
             .main-grid { grid-template-columns: 1fr; }
@@ -150,6 +151,7 @@
 
         let currentUserId, currentUsername, currentSubjectId, currentSubjectName;
         let subjectData = [], flashcardData = [], resourcesData = [];
+        let tempGeneratedCards = null;
 
         const loader = document.getElementById('loader');
         const showLoader = () => loader.style.display = 'block';
@@ -178,7 +180,7 @@
             }
         }
         
-        const sections = ['landing-section', 'login-section', 'app-section'];
+        const sections = ['landing-section', 'login-section', 'app-section', 'progress-section'];
         const footer = document.querySelector('.site-footer');
         const aiFab = document.getElementById('ai-fab');
 
@@ -189,37 +191,39 @@
         function router() {
             const path = window.location.hash.slice(1) || 'home';
             
-            sections.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.display = 'none';
+            document.querySelectorAll('#landing-section, #login-section, #app-section, #progress-modal').forEach(el => {
+                if(el) el.style.display = 'none';
             });
 
             if (footer) footer.style.display = 'none';
             if (aiFab) aiFab.style.display = 'none';
 
             if (path === 'login') {
-                const el = document.getElementById('login-section');
-                if (el) el.style.display = 'block';
+                document.getElementById('login-section').style.display = 'block';
             } else if (path === 'dashboard') {
                 if (localStorage.getItem('userId')) {
                     currentUserId = localStorage.getItem('userId');
                     currentUsername = localStorage.getItem('username');
-                    const appEl = document.getElementById('app-section');
-                    if (appEl) appEl.style.display = 'block';
-                    if (footer) footer.style.display = 'block';
-                    if (aiFab) aiFab.style.display = 'flex';
+                    document.getElementById('app-section').style.display = 'block';
+                    footer.style.display = 'block';
+                    aiFab.style.display = 'flex';
                     const welcomeEl = document.getElementById('welcome-message');
                     if (welcomeEl && !welcomeEl.textContent) {
-                        document.getElementById('welcome-message').textContent = `أهلاً بك، ${currentUsername}`;
+                        document.getElementById('welcome-message').textContent = `أهلاً بك، ${currentUsername} | <span class="points-display"></span>`;
                         loadSubjects();
                         updateUserPointsDisplay();
                     }
                 } else {
                     navigateTo('login');
                 }
+            } else if (path === 'progress') {
+                 if (localStorage.getItem('userId')) {
+                    document.getElementById('progress-modal').style.display = 'block';
+                 } else {
+                    navigateTo('login');
+                 }
             } else {
-                const el = document.getElementById('landing-section');
-                if (el) el.style.display = 'flex';
+                document.getElementById('landing-section').style.display = 'flex';
             }
         }
 
@@ -328,6 +332,7 @@
                             <button onclick="addSubject()">إضافة مادة</button>
                         </div>
                         <ul id="subjects-list" style="margin-top: 20px;"></ul>
+                        <a class="nav-link" onclick="navigateTo('progress')">عرض صفحة تقدمي</a>
                     </div>
                     <div id="main-content" style="display: none;">
                         <div class="card">
@@ -401,6 +406,13 @@
                         <button class="know-btn" onclick="handleQuizResponse('Mastered')">أعرفها</button>
                     </div>
                 </div>`;
+            
+            document.getElementById('progress-modal').innerHTML = `
+                <div class="modal-content">
+                    <span class="close-button" onclick="navigateTo('dashboard')">&times;</span>
+                    <h3>📊 صفحة تقدمي</h3>
+                    <div id="stats-container"></div>
+                </div>`;
         }
 
         async function login() {
@@ -447,6 +459,7 @@
                 document.getElementById('subject-name-input').value = '';
                 await loadSubjects();
                 selectSubject(newSubject.id, newSubject.name);
+                updateUserPointsDisplay();
             }
         }
 
@@ -515,26 +528,74 @@
         async function summarizeNote(resourceId) {
             const resource = resourcesData.find(r => r.id === resourceId);
             if (!resource) return;
-            const summary = await callAppsScript('summarizeText', [resource.content]);
+            openAIModal();
+            const chatHistory = document.getElementById('ai-chat-history');
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'chat-bubble typing-indicator';
+            typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+            chatHistory.appendChild(typingIndicator);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            const summary = await callAppsScript('summarizeText', [resource.content], false);
+            
+            chatHistory.removeChild(typingIndicator);
+            const aiBubble = document.createElement('div');
+            aiBubble.className = 'chat-bubble ai-bubble';
             if (summary) {
-                alert("ملخص الملاحظة:\n\n" + summary);
+                aiBubble.innerHTML = `<h4>ملخص الملاحظة "${resource.title}":</h4>${marked.parse(summary)}`;
+            } else {
+                aiBubble.textContent = "عذراً، لم أتمكن من تلخيص النص.";
             }
+            chatHistory.appendChild(aiBubble);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
         async function generateFlashcards(resourceId) {
             const resource = resourcesData.find(r => r.id === resourceId);
             if (!resource) return;
-            const generatedCards = await callAppsScript('generateFlashcardsFromText', [resource.content]);
+            openAIModal();
+            const chatHistory = document.getElementById('ai-chat-history');
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'chat-bubble typing-indicator';
+            typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+            chatHistory.appendChild(typingIndicator);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            const generatedCards = await callAppsScript('generateFlashcardsFromText', [resource.content], false);
+            
+            chatHistory.removeChild(typingIndicator);
+            const aiBubble = document.createElement('div');
+            aiBubble.className = 'chat-bubble ai-bubble';
+
             if (generatedCards && generatedCards.length > 0) {
-                if (confirm(`تم إنشاء ${generatedCards.length} بطاقة. هل تريد إضافتهم؟`)) {
-                    for (const card of generatedCards) {
-                        await callAppsScript('addFlashcard', [currentUserId, currentSubjectId, card.question, card.answer], false);
-                    }
-                    loadFlashcards(); // Refresh list
-                }
+                tempGeneratedCards = generatedCards;
+                let cardsHtml = `<h4>تم إنشاء ${generatedCards.length} بطاقة من ملاحظة "${resource.title}":</h4><ul>`;
+                generatedCards.forEach(c => {
+                    cardsHtml += `<li><strong>س:</strong> ${c.question} <strong>ج:</strong> ${c.answer}</li>`;
+                });
+                cardsHtml += '</ul><button class="ai-tool-btn" onclick="addGeneratedCards()">نعم، أضفهم للمادة</button>';
+                aiBubble.innerHTML = cardsHtml;
             } else {
-                alert("لم أتمكن من إنشاء بطاقات من هذا النص.");
+                aiBubble.textContent = "لم أتمكن من إنشاء بطاقات من هذا النص.";
             }
+            chatHistory.appendChild(aiBubble);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        async function addGeneratedCards() {
+            if (!tempGeneratedCards) return;
+            for (const card of tempGeneratedCards) {
+                await callAppsScript('addFlashcard', [currentUserId, currentSubjectId, card.question, card.answer], false);
+            }
+            tempGeneratedCards = null;
+            loadFlashcards();
+            updateUserPointsDisplay();
+            const chatHistory = document.getElementById('ai-chat-history');
+            const confirmationBubble = document.createElement('div');
+            confirmationBubble.className = 'chat-bubble ai-bubble';
+            confirmationBubble.textContent = 'تمت إضافة البطاقات بنجاح!';
+            chatHistory.appendChild(confirmationBubble);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
         async function addResource() {
@@ -548,6 +609,7 @@
                 document.getElementById('resource-title-input').value = '';
                 document.getElementById('resource-content-input').value = '';
                 loadResources();
+                updateUserPointsDisplay();
             }
         }
 
@@ -556,17 +618,42 @@
             flashcardData = await callAppsScript('getFlashcards', [currentUserId, currentSubjectId]) || [];
             const list = document.getElementById('flashcards-list');
             list.innerHTML = '';
-            if (flashcardData.length > 0) {
-                flashcardData.forEach(card => {
+            
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'ابحث في البطاقات...';
+            searchInput.onkeyup = () => filterFlashcards(searchInput.value);
+            list.appendChild(searchInput);
+
+            const flashcardsContainer = document.createElement('div');
+            flashcardsContainer.id = 'flashcards-container';
+            list.appendChild(flashcardsContainer);
+
+            renderFlashcards(flashcardData);
+        }
+
+        function renderFlashcards(cards) {
+            const container = document.getElementById('flashcards-container');
+            container.innerHTML = '';
+             if (cards && cards.length > 0) {
+                cards.forEach(card => {
                     const div = document.createElement('div');
                     div.className = 'flashcard-item';
                     div.innerHTML = `<p><strong>س:</strong> ${card.question}</p><p><strong>ج:</strong> ${card.answer}</p>
                                      <span class="flashcard-status status-${card.status}">${card.status}</span>`;
-                    list.appendChild(div);
+                    container.appendChild(div);
                 });
             } else {
-                list.innerHTML = '<p>لا توجد بطاقات مراجعة لهذه المادة بعد.</p>';
+                container.innerHTML = '<p>لا توجد بطاقات مراجعة لهذه المادة بعد.</p>';
             }
+        }
+
+        function filterFlashcards(term) {
+             const filtered = flashcardData.filter(f => 
+                f.question.toLowerCase().includes(term.toLowerCase()) || 
+                f.answer.toLowerCase().includes(term.toLowerCase())
+            );
+            renderFlashcards(filtered);
         }
 
         async function addFlashcard() {
@@ -578,6 +665,7 @@
              document.getElementById('flashcard-question-input').value = '';
              document.getElementById('flashcard-answer-input').value = '';
              loadFlashcards();
+             updateUserPointsDisplay();
         }
 
         async function generateSmartStudyPlan() {
@@ -634,6 +722,7 @@
         async function handleQuizResponse(status) {
             const card = quizFlashcards[currentCardIndex];
             await callAppsScript('updateFlashcardStatus', [currentUserId, card.id, status]);
+            updateUserPointsDisplay();
             currentCardIndex++;
             if (currentCardIndex >= quizFlashcards.length) {
                 alert('لقد أكملت جولة المراجعة الحالية!');
@@ -652,6 +741,28 @@
             } else {
                 toggle.textContent = '☀️';
                 localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        async function updateUserPointsDisplay() {
+            const stats = await callAppsScript('getUserStats', [currentUserId], false);
+            if (stats) {
+                const pointsEl = document.querySelector('.points-display');
+                if (pointsEl) pointsEl.textContent = `نقاطك: ${stats.points}`;
+            }
+        }
+        
+        async function showProgressPage() {
+            const stats = await callAppsScript('getUserStats', [currentUserId]);
+            if (stats) {
+                const container = document.getElementById('stats-container');
+                container.innerHTML = `
+                    <p><strong>إجمالي المواد:</strong> ${stats.subjectCount}</p>
+                    <p><strong>إجمالي الموارد:</strong> ${stats.resourceCount}</p>
+                    <p><strong>إجمالي البطاقات:</strong> ${stats.flashcardCount}</p>
+                    <p><strong>البطاقات المتقنة:</strong> ${stats.masteredFlashcards}</p>
+                    <p class="points-display" style="font-size: 1.2em;"><strong>مجموع نقاطك:</strong> ${stats.points}</p>
+                `;
             }
         }
 
