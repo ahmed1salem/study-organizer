@@ -5,13 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مُنظِّم المذاكرة الذكي</title>
     
+    <!-- SEO Meta Description -->
     <meta name="description" content="حوّل مذاكرتك مع مُنظِّم المذاكرة الذكي! أداة مجانية لتنظيم المواد الدراسية، إنشاء خطط ذكية أسبوعية، وصنع بطاقات تعليمية فعالة. احصل على نصائح شخصية من المساعد الذكي وتابع تقدمك بسهولة لتحقيق أفضل النتائج.">
 
+    <!-- Favicon -->
     <link rel="icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEipSyzskLTjBJQ7eGegZ-UaWo9-z1NgpDByEcnYfkNibq_yV8vDdPJUlJ3376WSR0aqns6RQPZg-S9bOJOFhK7WGObfhd08Rbi-3MA8P2TcOA63Y3mOGQUBMkZx-RButZJH3ntSNZ97Q-fycfUsRNCy0JD5CMfie3oTmfemrGEnjMZG3Hk-9hoG94yIwEk/s500/Study%20organizer%20no%20bg.png" type="image/png">
     
+    <!-- Font: Tajawal -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Library to render AI response formatting -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
     <style>
@@ -134,7 +139,7 @@
         .resource-item { background-color: var(--secondary-color); color: var(--font-color); padding: 15px; margin-bottom: 10px; position: relative; }
         .resource-item a { color: var(--primary-color); font-weight: bold; text-decoration: none; }
         .ai-tools { position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; }
-        .ai-tool-btn { font-size: 0.7em; padding: 4px 8px; width: auto; background-color: var(--info-color); }
+        .ai-tool-btn { font-size: 0.8em; padding: 5px 12px; width: auto; background-color: var(--info-color); }
         
         .site-footer {
             text-align: center;
@@ -166,6 +171,12 @@
         .points-display { font-weight: bold; color: var(--success-color); }
         .nav-link { cursor: pointer; text-decoration: underline; color: var(--primary-color); }
         .auth-toggle { text-align: center; margin-top: 15px; }
+        #study-plan-output {
+            background: #e9f5e9; padding: 15px; border-radius: 8px; color: #333;
+        }
+        .dark-mode #study-plan-output {
+            background: #2a4b42; color: #ecf0f1;
+        }
 
         @media (max-width: 768px) {
             .main-grid { grid-template-columns: 1fr; }
@@ -198,7 +209,7 @@
     </footer>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxiGpZQBw5K5FXsea2l_zDjgnD9nnNIlr_AS6uiNc84k5jlNqpnbsgAXWVzZRB0zFfGYA/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUNu3zndAUFj0mcy5k4JiqZH9dUAe35vrjZZMAgMX8fh9mTDvec9ZaMaY_qcyrV_1M3w/exec";
 
         let currentUserId, currentUsername, currentSubjectId, currentSubjectName;
         let subjectData = [], flashcardData = [], resourcesData = [];
