@@ -83,23 +83,37 @@
         .quiz-review ul { list-style-type: none; padding-right: 20px; }
         #leaderboard-list { list-style-type: decimal; padding-right: 20px; }
         #leaderboard-list li { margin-bottom: 10px; font-size: 1.1em; }
-        .landing-section { padding: 60px 20px; text-align: center; }
-        .landing-section h2 { font-size: 2.8em; font-weight: 800; color: var(--primary-dark); margin-bottom: 20px; }
-        .landing-section p { font-size: 1.2em; max-width: 800px; margin: 0 auto 40px auto; color: #555; }
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 40px; }
-        .feature-card { background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: var(--shadow); text-align: center; transition: transform 0.3s; }
-        .feature-card:hover { transform: translateY(-10px); }
-        .feature-card svg { width: 60px; height: 60px; stroke: var(--primary-color); margin-bottom: 20px; }
-        .feature-card h3 { font-size: 1.5em; margin-bottom: 10px; }
-        .testimonial { background: var(--secondary-color); padding: 40px; border-radius: 12px; margin: 60px 0; font-style: italic; border-right: 5px solid var(--primary-color); }
         footer { text-align: center; padding: 20px; background-color: #1c1c1c; color: #f0f0f0; font-size: 0.9em; }
         
+        /* --- Landing Page Styles --- */
+        .landing-section { padding: 80px 20px; text-align: center; }
+        .landing-section-bg { background-color: var(--secondary-color); }
+        .landing-section h2 { font-size: 2.8em; font-weight: 800; color: var(--primary-dark); margin-bottom: 20px; }
+        .landing-section .subtitle { font-size: 1.2em; max-width: 800px; margin: 0 auto 60px auto; color: #555; }
+        .feature-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; text-align: right; margin-top: 60px; }
+        .feature-details-grid.reverse { grid-template-columns: 1fr 1fr; } /* For LTR image placement */
+        .feature-details-grid.reverse .feature-text { order: 2; }
+        .feature-details-grid .feature-text h3 { font-size: 2em; color: var(--primary-color); margin-bottom: 15px; }
+        .feature-details-grid .feature-text p { font-size: 1.1em; line-height: 1.8; }
+        .feature-details-grid .feature-image img { max-width: 100%; border-radius: 12px; box-shadow: var(--shadow); }
+        .how-it-works-steps { display: flex; justify-content: center; gap: 40px; margin-top: 40px; flex-wrap: wrap; }
+        .step-card { background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: var(--shadow); width: 250px; }
+        .step-card .step-number { font-size: 2em; font-weight: 800; color: var(--primary-color); background-color: var(--secondary-color); border-radius: 50%; width: 50px; height: 50px; line-height: 50px; margin: 0 auto 20px auto; }
+        .faq-item { margin-bottom: 15px; text-align: right; }
+        .faq-question { background-color: var(--secondary-color); padding: 15px; border-radius: 8px; cursor: pointer; font-weight: 700; }
+        .faq-answer { padding: 15px; display: none; }
+        .testimonial { background: rgba(255,255,255,0.7); padding: 40px; border-radius: 12px; font-style: italic; border-right: 5px solid var(--primary-color); }
+        .cta-button { width:auto; padding: 18px 40px; font-size: 1.3em; border-radius: 50px; box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4); }
+
         @media (max-width: 768px) {
             .main-grid { grid-template-columns: 1fr; }
             .container { padding: 0 10px; }
             #ai-modal .modal-content { width: 100%; height: 100%; max-width: 100%; margin: 0; border-radius: 0; }
             #ai-fab { bottom: 20px; right: 20px; width: 60px; height: 60px; font-size: 2em; line-height: 60px; }
             .landing-section h2 { font-size: 2.2em; }
+            .feature-details-grid, .feature-details-grid.reverse { grid-template-columns: 1fr; }
+            .feature-details-grid .feature-text { order: 1; text-align: center; }
+            .feature-details-grid .feature-image { order: 2; }
         }
     </style>
 </head>
@@ -122,10 +136,11 @@
 
     <script>
         // ضع رابط الـ Web App الخاص بك الذي تم نشره من Apps Script هنا
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyG51RFlPrDSb7dkJIghLt3HBwZcLNzM7FEmL39rSG9--Cp9Cmb7eBePMtoyVuXxlggsg/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUNu3zndAUFj0mcy5k4JiqZH9dUAe35vrjZZMAgMX8fh9mTDvec9ZaMaY_qcyrV_1M3w/exec";
 
         let currentUserId, currentUsername, currentSubjectId;
         let subjectData = [], resourcesData = [], flashcardData = [];
+        let tempGeneratedCards = null; // لتخزين البطاقات المولدة مؤقتاً
         
         const loader = document.getElementById('loader');
         const showLoader = () => loader.style.display = 'block';
@@ -216,47 +231,79 @@
                             <p style="font-size: 1.3em; max-width: 700px; margin: 20px auto 40px auto; color: #444; font-weight: 500;">
                                 مساعدك الشخصي لتنظيم المواد، إنشاء خطط دراسية فعالة، وتحويل أي نص إلى اختبارات وبطاقات تعليمية بلمسة زر. ابدأ رحلتك نحو التفوق اليوم.
                             </p>
-                            <button onclick="navigateTo('login')" style="width:auto; padding: 18px 40px; font-size: 1.3em; border-radius: 50px; box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);">ابدأ الآن مجاناً</button>
+                            <button onclick="navigateTo('login')" class="cta-button">ابدأ الآن مجاناً</button>
                         </div>
                     </div>
                 </div>
-                <div class="container">
-                    <div class="landing-section">
-                        <h2>لماذا نحن خيارك الأفضل؟</h2>
-                        <div class="features-grid">
-                            <div class="feature-card">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                                <h3>تنظيم ذكي</h3>
-                                <p>أضف موادك وحدد أولوياتها، واحصل على رؤية واضحة لمسارك الدراسي. لا مزيد من الفوضى.</p>
+
+                <div class="container landing-section">
+                    <h2>كيف يعمل؟ في 3 خطوات بسيطة</h2>
+                    <div class="how-it-works-steps">
+                        <div class="step-card"><div class="step-number">1</div><h3>سجل حسابك</h3><p>أنشئ حسابك المجاني في أقل من دقيقة وابدأ رحلتك.</p></div>
+                        <div class="step-card"><div class="step-number">2</div><h3>أضف موادك</h3><p>نظم موادك الدراسية ومواردك في مكان واحد سهل الوصول.</p></div>
+                        <div class="step-card"><div class="step-number">3</div><h3>ذاكر بذكاء</h3><p>استخدم أدوات الذكاء الاصطناعي والتحديات لتحقيق أفضل النتائج.</p></div>
+                    </div>
+                </div>
+
+                <div class="landing-section-bg">
+                    <div class="container landing-section">
+                        <h2>مميزات تغير قواعد اللعبة</h2>
+                        <p class="subtitle">نحن لا ننظم مذاكرتك فقط، بل نمنحك الأدوات لتتفوق فيها.</p>
+                        
+                        <div class="feature-details-grid">
+                            <div class="feature-text">
+                                <h3>تنظيم وتحكم كامل</h3>
+                                <p>ودّع الفوضى والملاحظات المبعثرة. احتفظ بكل موادك، روابطك، وملاحظاتك في مكتبة رقمية خاصة بك، وقم بإنشاء بطاقات تعليمية مخصصة لترسيخ المعلومات الهامة.</p>
                             </div>
-                            <div class="feature-card">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8V8H6V12h2v4h8v-4h2V12h-2z"/><path d="M9 18v-2"/><path d="M15 18v-2"/></svg>
-                                <h3>المساعد الذكي (AI)</h3>
-                                <p>لخص النصوص الطويلة، أنشئ اختبارات فورية من أي درس، وحوّل ملاحظاتك إلى بطاقات مراجعة فعالة.</p>
+                            <div class="feature-image">
+                                <img src="https://i.ibb.co/6yY4qYc/feature1.png" alt="تنظيم المواد الدراسية">
                             </div>
-                            <div class="feature-card">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1"/></svg>
-                                <h3>التحفيز والمشاركة</h3>
-                                <p>اجمع النقاط مع كل إنجاز، نافس في لوحة الصدارة، وشارك أفضل مواردك مع زملائك بسهولة.</p>
+                        </div>
+
+                        <div class="feature-details-grid reverse">
+                             <div class="feature-image">
+                                <img src="https://i.ibb.co/SNyFrkS/feature2.png" alt="المساعد الذكي">
+                            </div>
+                            <div class="feature-text">
+                                <h3>قوة الذكاء الاصطناعي بين يديك</h3>
+                                <p>هل تواجه صعوبة في فهم درس معين؟ دع المساعد الذكي يشرحه لك. هل تريد اختبار نفسك؟ حوّل أي نص إلى اختبار فوري. هل تحتاج لملخص؟ احصل عليه بضغطة زر.</p>
+                            </div>
+                        </div>
+
+                         <div class="feature-details-grid">
+                            <div class="feature-text">
+                                <h3>نظام تحفيزي ومجتمع تشاركي</h3>
+                                <p>حوّل المذاكرة إلى لعبة ممتعة! أنجز التحديات اليومية، اجمع النقاط، وتنافس مع زملائك في لوحة الصدارة. يمكنك أيضاً مشاركة أفضل مواردك معهم لمساعدة بعضكم البعض.</p>
+                            </div>
+                            <div class="feature-image">
+                                <img src="https://i.ibb.co/P9tLg3D/feature3.png" alt="نظام تحفيزي">
                             </div>
                         </div>
                     </div>
                 </div>
-                <div style="background-color: var(--secondary-color);">
-                     <div class="container">
-                        <div class="landing-section">
-                             <div class="testimonial">
-                                <p>"هذا الموقع غير طريقة مذاكرتي تمامًا. المساعد الذكي ولوحة الصدارة جعلوا المذاكرة ممتعة ومحفزة أكثر من أي وقت مضى."</p>
-                                <cite>- طالب جامعي</cite>
-                            </div>
+
+                <div class="container landing-section">
+                    <h2>أسئلة شائعة</h2>
+                     <div style="max-width: 700px; margin: 0 auto;">
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFaq(this)">هل الموقع مجاني بالكامل؟</div>
+                            <div class="faq-answer"><p>نعم، جميع الميزات الحالية في الموقع مجانية تماماً. هدفنا هو مساعدة أكبر عدد ممكن من الطلاب.</p></div>
+                        </div>
+                         <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFaq(this)">كيف يعمل المساعد الذكي؟</div>
+                            <div class="faq-answer"><p>نستخدم أحدث نماذج الذكاء الاصطناعي من Google (Gemini API) لتحليل النصوص وتقديم إجابات ذكية ودقيقة بناءً على طلبك.</p></div>
+                        </div>
+                         <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFaq(this)">هل بياناتي آمنة؟</div>
+                            <div class="faq-answer"><p>بالتأكيد. يتم تخزين بياناتك بشكل آمن، وكلمات المرور الخاصة بك مشفرة بالكامل. خصوصيتك هي أولويتنا القصوى.</p></div>
                         </div>
                     </div>
                 </div>
-                <div class="container">
-                    <div class="landing-section">
-                        <h2>جاهز لتبدأ؟</h2>
-                        <p>انضم الآن لمجتمع الطلاب الذين يذاكرون بذكاء، وليس بجهد أكبر.</p>
-                        <button onclick="navigateTo('login')" style="width:auto; padding: 18px 40px; font-size: 1.3em; border-radius: 50px; box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);">أنشئ حسابك المجاني</button>
+                
+                <div style="background: rgba(255,255,255,0.7); backdrop-filter: blur(5px);">
+                    <div class="container landing-section">
+                        <h2>جاهز لتبدأ رحلة التفوق؟</h2>
+                        <button onclick="navigateTo('login')" class="cta-button">أنشئ حسابك المجاني الآن</button>
                     </div>
                 </div>`;
 
@@ -405,11 +452,11 @@
             loadFlashcards();
         }
 
-        // --- [تم الإصلاح] Resources ---
+        // --- Resources ---
         async function loadResources() {
             resourcesData = await callAppsScript('getResources', [currentUserId, currentSubjectId]) || [];
             const list = document.getElementById('resources-list');
-            list.innerHTML = ''; // Clear previous resources
+            list.innerHTML = '';
             if (resourcesData.length === 0) {
                 list.innerHTML = '<p>لا توجد موارد لهذه المادة بعد.</p>';
                 return;
@@ -425,7 +472,7 @@
                         <button class="ai-tool-btn" onclick="summarizeNote('${res.id}')">لخص</button>
                         <button class="ai-tool-btn" onclick="generateFlashcardsFromNote('${res.id}')">حوّل لبطاقات</button>
                     </div>`;
-                } else { // For 'youtube' or 'link'
+                } else {
                     contentHTML += `<a href="${res.content}" target="_blank" rel="noopener noreferrer">فتح المصدر</a>`;
                 }
                 
@@ -570,9 +617,58 @@
             }
         }
         
-        // --- AI Helpers for Resources ---
-        function summarizeNote(resourceId) { /* ... implementation ... */ alert('Summarize feature coming soon.'); }
-        function generateFlashcardsFromNote(resourceId) { /* ... implementation ... */ alert('Generate flashcards feature coming soon.'); }
+        // --- [تم التفعيل] AI Helpers for Resources ---
+        async function summarizeNote(resourceId) {
+            const resource = resourcesData.find(r => r.id === resourceId);
+            if (!resource) return;
+            openAIModal();
+            const chatHistory = document.getElementById('ai-chat-history');
+            chatHistory.innerHTML += `<div class="chat-bubble user-bubble">لخص لي الملاحظة: "${resource.title}"</div>`;
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            const summary = await callAppsScript('summarizeText', [resource.content], false);
+            chatHistory.innerHTML += `<div class="chat-bubble ai-bubble">${summary ? marked.parse(summary) : 'لم أتمكن من تلخيص النص.'}</div>`;
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+        async function generateFlashcardsFromNote(resourceId) {
+            const resource = resourcesData.find(r => r.id === resourceId);
+            if (!resource) return;
+            openAIModal();
+            const chatHistory = document.getElementById('ai-chat-history');
+            chatHistory.innerHTML += `<div class="chat-bubble user-bubble">حوّل الملاحظة "${resource.title}" إلى بطاقات</div>`;
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            const generatedCards = await callAppsScript('generateFlashcardsFromText', [resource.content], false);
+            
+            if (generatedCards && generatedCards.length > 0) {
+                tempGeneratedCards = generatedCards;
+                let cardsHtml = `<h4>تم إنشاء ${generatedCards.length} بطاقة. هل تريد إضافتها للمادة الحالية؟</h4><ul>`;
+                generatedCards.forEach(c => {
+                    cardsHtml += `<li><strong>س:</strong> ${c.question}</li>`;
+                });
+                cardsHtml += `</ul><button class="success" style="width:auto; padding: 8px 15px;" onclick="addGeneratedCards(this)">نعم، أضفهم الآن</button>`;
+                chatHistory.innerHTML += `<div class="chat-bubble ai-bubble">${cardsHtml}</div>`;
+            } else {
+                chatHistory.innerHTML += `<div class="chat-bubble ai-bubble">لم أتمكن من إنشاء بطاقات من هذا النص.</div>`;
+            }
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+        
+        async function addGeneratedCards(button) {
+            if (!tempGeneratedCards) return;
+            button.disabled = true;
+            button.textContent = 'جاري الحفظ...';
+
+            for (const card of tempGeneratedCards) {
+                await callAppsScript('addFlashcard', [currentUserId, currentSubjectId, card.question, card.answer], false);
+            }
+            
+            tempGeneratedCards = null;
+            button.parentElement.innerHTML += "<p><strong>تمت إضافة البطاقات بنجاح!</strong></p>";
+            
+            loadFlashcards();
+            updateUserPointsDisplay();
+        }
 
         // --- Modals & Helpers ---
         function openAIModal() { document.getElementById('ai-modal').style.display = 'block'; }
@@ -603,6 +699,14 @@
             if(result.success) {
                 alert(result.message);
                 closeModal('change-password-modal');
+            }
+        }
+        function toggleFaq(element) {
+            const answer = element.nextElementSibling;
+            if (answer.style.display === "block") {
+                answer.style.display = "none";
+            } else {
+                answer.style.display = "block";
             }
         }
 
