@@ -10,7 +10,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
@@ -23,8 +23,8 @@
             --ai-bubble-bg: #e9e9eb;
         }
         .dark-mode {
-            --secondary-color: #2c3e50; --font-color: #ecf0f1; --border-color: #34495e;
-            --card-bg: rgba(44, 62, 80, 0.85); --ai-bubble-bg: #34495e;
+            --secondary-color: #1f2937; --font-color: #ecf0f1; --border-color: #374151;
+            --card-bg: rgba(31, 41, 55, 0.85); --ai-bubble-bg: #4b5563;
         }
         body { 
             font-family: 'Tajawal', sans-serif; margin: 0; 
@@ -41,8 +41,8 @@
             border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
         }
-        .card h2, .card h3 { margin-top: 0; color: var(--primary-dark); border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; margin-bottom: 20px; font-weight: 700; }
-        .main-grid { display: grid; grid-template-columns: 300px 1fr; gap: 30px; align-items: start; }
+        .card h2, .card h3 { margin-top: 0; color: var(--primary-dark); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; font-weight: 700; }
+        .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 30px; align-items: start; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
         .modal-content { background-color: var(--card-bg); backdrop-filter: blur(5px); margin: 10% auto; padding: 30px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 12px; }
         .close-button { color: #aaa; float: left; font-size: 28px; font-weight: bold; cursor: pointer; }
@@ -83,12 +83,23 @@
         .quiz-review ul { list-style-type: none; padding-right: 20px; }
         #leaderboard-list { list-style-type: decimal; padding-right: 20px; }
         #leaderboard-list li { margin-bottom: 10px; font-size: 1.1em; }
-        footer { text-align: center; padding: 15px; background-color: #1c1c1c; color: #f0f0f0; font-size: 0.9em; }
+        .landing-section { padding: 60px 20px; text-align: center; }
+        .landing-section h2 { font-size: 2.8em; font-weight: 800; color: var(--primary-dark); margin-bottom: 20px; }
+        .landing-section p { font-size: 1.2em; max-width: 800px; margin: 0 auto 40px auto; color: #555; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 40px; }
+        .feature-card { background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: var(--shadow); text-align: center; transition: transform 0.3s; }
+        .feature-card:hover { transform: translateY(-10px); }
+        .feature-card svg { width: 60px; height: 60px; stroke: var(--primary-color); margin-bottom: 20px; }
+        .feature-card h3 { font-size: 1.5em; margin-bottom: 10px; }
+        .testimonial { background: var(--secondary-color); padding: 40px; border-radius: 12px; margin: 60px 0; font-style: italic; border-right: 5px solid var(--primary-color); }
+        footer { text-align: center; padding: 20px; background-color: #1c1c1c; color: #f0f0f0; font-size: 0.9em; }
+        
         @media (max-width: 768px) {
             .main-grid { grid-template-columns: 1fr; }
             .container { padding: 0 10px; }
             #ai-modal .modal-content { width: 100%; height: 100%; max-width: 100%; margin: 0; border-radius: 0; }
             #ai-fab { bottom: 20px; right: 20px; width: 60px; height: 60px; font-size: 2em; line-height: 60px; }
+            .landing-section h2 { font-size: 2.2em; }
         }
     </style>
 </head>
@@ -196,29 +207,61 @@
         window.addEventListener('hashchange', router);
         
         function renderInitialUI() {
+            // --- [تم التطوير] صفحة الهبوط المحسنة ---
             document.getElementById('landing-section').innerHTML = `
-                <div class="container" style="text-align: center; padding: 50px 20px;">
-                    <h1 style="font-size: 2.5em;">حوّل مذاكرتك مع المساعد الذكي المطور</h1>
-                    <p style="font-size: 1.2em; max-width: 700px; margin: 20px auto;">نظّم، اختبر، تحدى نفسك، وشارك المعرفة مع زملائك. كل أدوات النجاح في مكان واحد.</p>
-                    <button onclick="navigateTo('login')" style="width:auto; padding: 15px 30px; font-size: 1.2em; margin-top: 20px;">ابدأ الآن مجاناً</button>
+                <div style="background-color: rgba(255, 255, 255, 0.7); backdrop-filter: blur(5px);">
+                    <div class="container">
+                        <div class="landing-section" style="padding-top: 80px; padding-bottom: 80px;">
+                            <h1 style="font-size: 3.5em; font-weight: 800; color: var(--primary-dark);">حوّل مذاكرتك إلى تجربة ذكية</h1>
+                            <p style="font-size: 1.3em; max-width: 700px; margin: 20px auto 40px auto; color: #444; font-weight: 500;">
+                                مساعدك الشخصي لتنظيم المواد، إنشاء خطط دراسية فعالة، وتحويل أي نص إلى اختبارات وبطاقات تعليمية بلمسة زر. ابدأ رحلتك نحو التفوق اليوم.
+                            </p>
+                            <button onclick="navigateTo('login')" style="width:auto; padding: 18px 40px; font-size: 1.3em; border-radius: 50px; box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);">ابدأ الآن مجاناً</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="landing-section">
+                        <h2>لماذا نحن خيارك الأفضل؟</h2>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                                <h3>تنظيم ذكي</h3>
+                                <p>أضف موادك وحدد أولوياتها، واحصل على رؤية واضحة لمسارك الدراسي. لا مزيد من الفوضى.</p>
+                            </div>
+                            <div class="feature-card">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8V8H6V12h2v4h8v-4h2V12h-2z"/><path d="M9 18v-2"/><path d="M15 18v-2"/></svg>
+                                <h3>المساعد الذكي (AI)</h3>
+                                <p>لخص النصوص الطويلة، أنشئ اختبارات فورية من أي درس، وحوّل ملاحظاتك إلى بطاقات مراجعة فعالة.</p>
+                            </div>
+                            <div class="feature-card">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1"/></svg>
+                                <h3>التحفيز والمشاركة</h3>
+                                <p>اجمع النقاط مع كل إنجاز، نافس في لوحة الصدارة، وشارك أفضل مواردك مع زملائك بسهولة.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="background-color: var(--secondary-color);">
+                     <div class="container">
+                        <div class="landing-section">
+                             <div class="testimonial">
+                                <p>"هذا الموقع غير طريقة مذاكرتي تمامًا. المساعد الذكي ولوحة الصدارة جعلوا المذاكرة ممتعة ومحفزة أكثر من أي وقت مضى."</p>
+                                <cite>- طالب جامعي</cite>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="landing-section">
+                        <h2>جاهز لتبدأ؟</h2>
+                        <p>انضم الآن لمجتمع الطلاب الذين يذاكرون بذكاء، وليس بجهد أكبر.</p>
+                        <button onclick="navigateTo('login')" style="width:auto; padding: 18px 40px; font-size: 1.3em; border-radius: 50px; box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);">أنشئ حسابك المجاني</button>
+                    </div>
                 </div>`;
-            document.getElementById('login-section').innerHTML = `
-                <div class="card" style="max-width: 400px; margin: 50px auto;">
-                    <h2 style="text-align: center;">تسجيل الدخول</h2>
-                    <input type="text" id="username-input" placeholder="اسم المستخدم">
-                    <input type="password" id="password-input" placeholder="كلمة المرور">
-                    <button onclick="login()">دخول</button>
-                    <div class="auth-toggle"><a class="nav-link" onclick="navigateTo('signup')">ليس لديك حساب؟ أنشئ واحداً</a></div>
-                </div>`;
-            document.getElementById('signup-section').innerHTML = `
-                <div class="card" style="max-width: 400px; margin: 50px auto;">
-                    <h2 style="text-align: center;">إنشاء حساب جديد</h2>
-                    <input type="text" id="signup-username" placeholder="اسم المستخدم (إنجليزية)">
-                    <input type="password" id="signup-password" placeholder="كلمة المرور">
-                    <input type="password" id="signup-confirm-password" placeholder="تأكيد كلمة المرور">
-                    <button onclick="register()">إنشاء حساب</button>
-                    <div class="auth-toggle"><a class="nav-link" onclick="navigateTo('login')">لديك حساب بالفعل؟</a></div>
-                </div>`;
+
+            document.getElementById('login-section').innerHTML = `<div class="card" style="max-width: 400px; margin: 50px auto;"><h2 style="text-align: center;">تسجيل الدخول</h2><input type="text" id="username-input" placeholder="اسم المستخدم"><input type="password" id="password-input" placeholder="كلمة المرور"><button onclick="login()">دخول</button><div class="auth-toggle"><a class="nav-link" onclick="navigateTo('signup')">ليس لديك حساب؟ أنشئ واحداً</a></div></div>`;
+            document.getElementById('signup-section').innerHTML = `<div class="card" style="max-width: 400px; margin: 50px auto;"><h2 style="text-align: center;">إنشاء حساب جديد</h2><input type="text" id="signup-username" placeholder="اسم المستخدم (إنجليزية)"><input type="password" id="signup-password" placeholder="كلمة المرور"><input type="password" id="signup-confirm-password" placeholder="تأكيد كلمة المرور"><button onclick="register()">إنشاء حساب</button><div class="auth-toggle"><a class="nav-link" onclick="navigateTo('login')">لديك حساب بالفعل؟</a></div></div>`;
             
             document.getElementById('app-section').innerHTML = `
                 <header class="card" style="margin-bottom: 20px;">
@@ -265,7 +308,7 @@
                         </div>
                         <hr style="margin: 40px 0;">
                         <div id="flashcard-maker">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                                 <h3>🃏 البطاقات التعليمية</h3>
                                 <button id="start-quiz-btn" class="success" style="width: auto; padding: 8px 15px;" onclick="startQuiz()">بدء الاختبار</button>
                             </div>
@@ -337,8 +380,8 @@
                 const li = document.createElement('li');
                 li.dataset.id = s.id;
                 li.innerHTML = `
-                    <span style="flex-grow: 1;">${s.name}</span>
-                    <button onclick="event.stopPropagation(); shareSubject('${s.id}', '${s.name}')" class="ai-tool-btn" style="background-color: var(--warning-color); font-size:0.7em; padding: 4px 8px; margin-left: 10px;" title="مشاركة المادة">🔗</button>
+                    <span style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${s.name}</span>
+                    <button onclick="event.stopPropagation(); shareSubject('${s.id}', '${s.name}')" class="ai-tool-btn" style="background-color: var(--warning-color); color: #333; font-size:0.7em; padding: 4px 8px; margin-left: 10px; border: none;" title="مشاركة المادة">🔗</button>
                     <span class="priority-dot priority-${s.priority}"></span>`;
                 li.onclick = () => selectSubject(s.id, s.name);
                 list.appendChild(li);
@@ -362,15 +405,31 @@
             loadFlashcards();
         }
 
-        // --- Resources ---
+        // --- [تم الإصلاح] Resources ---
         async function loadResources() {
             resourcesData = await callAppsScript('getResources', [currentUserId, currentSubjectId]) || [];
             const list = document.getElementById('resources-list');
-            list.innerHTML = '';
+            list.innerHTML = ''; // Clear previous resources
+            if (resourcesData.length === 0) {
+                list.innerHTML = '<p>لا توجد موارد لهذه المادة بعد.</p>';
+                return;
+            }
             resourcesData.forEach(res => {
                 const div = document.createElement('div');
                 div.className = 'resource-item';
-                div.innerHTML = `<strong>${res.title}</strong>: <a href="${res.content}" target="_blank">فتح المصدر</a>`;
+                let contentHTML = `<strong>${res.title}</strong><br>`;
+                
+                if (res.type === 'note') {
+                    contentHTML += `<p style="white-space: pre-wrap; margin-top: 5px;">${res.content}</p>`;
+                    contentHTML += `<div style="position: absolute; top: 10px; left: 10px; display: flex; gap: 5px;">
+                        <button class="ai-tool-btn" onclick="summarizeNote('${res.id}')">لخص</button>
+                        <button class="ai-tool-btn" onclick="generateFlashcardsFromNote('${res.id}')">حوّل لبطاقات</button>
+                    </div>`;
+                } else { // For 'youtube' or 'link'
+                    contentHTML += `<a href="${res.content}" target="_blank" rel="noopener noreferrer">فتح المصدر</a>`;
+                }
+                
+                div.innerHTML = contentHTML;
                 list.appendChild(div);
             });
         }
@@ -391,6 +450,10 @@
             flashcardData = await callAppsScript('getFlashcards', [currentUserId, currentSubjectId]) || [];
             const list = document.getElementById('flashcards-list');
             list.innerHTML = '';
+            if(flashcardData.length === 0) {
+                list.innerHTML = '<p>لا توجد بطاقات لهذه المادة بعد.</p>';
+                return;
+            }
             flashcardData.forEach(card => {
                 list.innerHTML += `<div class="flashcard-item"><strong>س:</strong> ${card.question}<br><strong>ج:</strong> ${card.answer}</div>`;
             });
@@ -405,16 +468,16 @@
             loadFlashcards();
             updateUserPointsDisplay();
         }
-        function startQuiz() { /* ... implementation needed ... */ alert('Quiz feature needs implementation.'); }
+        function startQuiz() { alert('سيتم تنفيذ ميزة الاختبار الذكي قريباً.'); }
 
         // --- New Features (Gamification & Sharing) ---
         async function getTodaysChallenge() {
             const challenge = await callAppsScript('getTodaysChallenge', [currentUserId], false);
             const container = document.getElementById('challenge-text');
             if (challenge) {
-                container.innerHTML = `${challenge.description} (+${challenge.points} نقطة) <button class="success" style="width:auto; font-size: 0.8em; padding: 5px 10px;" onclick="completeChallenge('${challenge.id}')">أكملت التحدي</button>`;
+                container.innerHTML = `${challenge.description} (+${challenge.points} نقطة) <button class="success" style="width:auto; font-size: 0.8em; padding: 5px 10px; margin-right: 10px;" onclick="completeChallenge('${challenge.id}')">أكملت التحدي</button>`;
             } else {
-                container.textContent = 'رائع! لا توجد تحديات جديدة اليوم.';
+                container.textContent = 'رائع! لقد أكملت كل التحديات المتاحة اليوم.';
             }
         }
         async function completeChallenge(challengeId) {
@@ -450,7 +513,7 @@
                     <h3>🔗 مشاركة "${subjectName}"</h3>
                     <p>انسخ الرابط وأرسله لزملائك:</p>
                     <input type="text" value="${link}" id="share-link-input" readonly style="direction: ltr;">
-                    <button onclick="document.getElementById('share-link-input').select(); document.execCommand('copy');">نسخ</button>
+                    <button onclick="document.getElementById('share-link-input').select(); document.execCommand('copy'); alert('تم نسخ الرابط!');">نسخ</button>
                 </div>`;
                 modal.style.display = 'block';
             }
@@ -501,8 +564,15 @@
                 });
                 chatHistory.innerHTML += `<div class="chat-bubble ai-bubble">${quizHtml}</div>`;
                 chatHistory.scrollTop = chatHistory.scrollHeight;
+            } else {
+                 chatHistory.innerHTML += `<div class="chat-bubble ai-bubble">عذراً، لم أتمكن من إنشاء اختبار.</div>`;
+                 chatHistory.scrollTop = chatHistory.scrollHeight;
             }
         }
+        
+        // --- AI Helpers for Resources ---
+        function summarizeNote(resourceId) { /* ... implementation ... */ alert('Summarize feature coming soon.'); }
+        function generateFlashcardsFromNote(resourceId) { /* ... implementation ... */ alert('Generate flashcards feature coming soon.'); }
 
         // --- Modals & Helpers ---
         function openAIModal() { document.getElementById('ai-modal').style.display = 'block'; }
