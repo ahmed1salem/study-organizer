@@ -85,28 +85,13 @@
         #leaderboard-list li { margin-bottom: 10px; font-size: 1.1em; }
         footer { text-align: center; padding: 20px; background-color: #1c1c1c; color: #f0f0f0; font-size: 0.9em; }
         
-        /* --- [تمت الإضافة] Typing Indicator Styles --- */
-        .typing-indicator { align-self: flex-end; }
-        .typing-indicator span { 
-            height: 8px; width: 8px; margin: 0 2px; 
-            background-color: #999; border-radius: 50%; 
-            display: inline-block; 
-            animation: bounce 1.4s infinite ease-in-out both; 
-        }
-        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes bounce { 
-            0%, 80%, 100% { transform: scale(0); } 
-            40% { transform: scale(1.0); } 
-        }
-
         /* --- Landing Page Styles --- */
         .landing-section { padding: 80px 20px; text-align: center; }
         .landing-section-bg { background-color: var(--secondary-color); }
         .landing-section h2 { font-size: 2.8em; font-weight: 800; color: var(--primary-dark); margin-bottom: 20px; }
         .landing-section .subtitle { font-size: 1.2em; max-width: 800px; margin: 0 auto 60px auto; color: #555; }
         .feature-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; text-align: right; margin-top: 60px; }
-        .feature-details-grid.reverse { grid-template-columns: 1fr 1fr; }
+        .feature-details-grid.reverse { grid-template-columns: 1fr 1fr; } /* For LTR image placement */
         .feature-details-grid.reverse .feature-text { order: 2; }
         .feature-details-grid .feature-text h3 { font-size: 2em; color: var(--primary-color); margin-bottom: 15px; }
         .feature-details-grid .feature-text p { font-size: 1.1em; line-height: 1.8; }
@@ -151,11 +136,11 @@
 
     <script>
         // ضع رابط الـ Web App الخاص بك الذي تم نشره من Apps Script هنا
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyG51RFlPrDSb7dkJIghLt3HBwZcLNzM7FEmL39rSG9--Cp9Cmb7eBePMtoyVuXxlggsg/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUNu3zndAUFj0mcy5k4JiqZH9dUAe35vrjZZMAgMX8fh9mTDvec9ZaMaY_qcyrV_1M3w/exec";
 
         let currentUserId, currentUsername, currentSubjectId;
         let subjectData = [], resourcesData = [], flashcardData = [];
-        let tempGeneratedCards = null;
+        let tempGeneratedCards = null; // لتخزين البطاقات المولدة مؤقتاً
         
         const loader = document.getElementById('loader');
         const showLoader = () => loader.style.display = 'block';
@@ -237,6 +222,7 @@
         window.addEventListener('hashchange', router);
         
         function renderInitialUI() {
+            // --- [تم التطوير] صفحة الهبوط المحسنة ---
             document.getElementById('landing-section').innerHTML = `
                 <div style="background-color: rgba(255, 255, 255, 0.7); backdrop-filter: blur(5px);">
                     <div class="container">
@@ -249,6 +235,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="container landing-section">
                     <h2>كيف يعمل؟ في 3 خطوات بسيطة</h2>
                     <div class="how-it-works-steps">
@@ -257,67 +244,141 @@
                         <div class="step-card"><div class="step-number">3</div><h3>ذاكر بذكاء</h3><p>استخدم أدوات الذكاء الاصطناعي والتحديات لتحقيق أفضل النتائج.</p></div>
                     </div>
                 </div>
+
                 <div class="landing-section-bg">
                     <div class="container landing-section">
                         <h2>مميزات تغير قواعد اللعبة</h2>
                         <p class="subtitle">نحن لا ننظم مذاكرتك فقط، بل نمنحك الأدوات لتتفوق فيها.</p>
+                        
                         <div class="feature-details-grid">
-                            <div class="feature-text"><h3>تنظيم وتحكم كامل</h3><p>ودّع الفوضى والملاحظات المبعثرة. احتفظ بكل موادك، روابطك، وملاحظاتك في مكتبة رقمية خاصة بك، وقم بإنشاء بطاقات تعليمية مخصصة لترسيخ المعلومات الهامة.</p></div>
-                            <div class="feature-image"><img src="https://i.ibb.co/6yY4qYc/feature1.png" alt="تنظيم المواد الدراسية"></div>
+                            <div class="feature-text">
+                                <h3>تنظيم وتحكم كامل</h3>
+                                <p>ودّع الفوضى والملاحظات المبعثرة. احتفظ بكل موادك، روابطك، وملاحظاتك في مكتبة رقمية خاصة بك، وقم بإنشاء بطاقات تعليمية مخصصة لترسيخ المعلومات الهامة.</p>
+                            </div>
+                            <div class="feature-image">
+                                <img src="https://i.ibb.co/6yY4qYc/feature1.png" alt="تنظيم المواد الدراسية">
+                            </div>
                         </div>
+
                         <div class="feature-details-grid reverse">
-                             <div class="feature-image"><img src="https://i.ibb.co/SNyFrkS/feature2.png" alt="المساعد الذكي"></div>
-                            <div class="feature-text"><h3>قوة الذكاء الاصطناعي بين يديك</h3><p>هل تواجه صعوبة في فهم درس معين؟ دع المساعد الذكي يشرحه لك. هل تريد اختبار نفسك؟ حوّل أي نص إلى اختبار فوري. هل تحتاج لملخص؟ احصل عليه بضغطة زر.</p></div>
+                             <div class="feature-image">
+                                <img src="https://i.ibb.co/SNyFrkS/feature2.png" alt="المساعد الذكي">
+                            </div>
+                            <div class="feature-text">
+                                <h3>قوة الذكاء الاصطناعي بين يديك</h3>
+                                <p>هل تواجه صعوبة في فهم درس معين؟ دع المساعد الذكي يشرحه لك. هل تريد اختبار نفسك؟ حوّل أي نص إلى اختبار فوري. هل تحتاج لملخص؟ احصل عليه بضغطة زر.</p>
+                            </div>
                         </div>
+
                          <div class="feature-details-grid">
-                            <div class="feature-text"><h3>نظام تحفيزي ومجتمع تشاركي</h3><p>حوّل المذاكرة إلى لعبة ممتعة! أنجز التحديات اليومية، اجمع النقاط، وتنافس مع زملائك في لوحة الصدارة. يمكنك أيضاً مشاركة أفضل مواردك معهم لمساعدة بعضكم البعض.</p></div>
-                            <div class="feature-image"><img src="https://i.ibb.co/P9tLg3D/feature3.png" alt="نظام تحفيزي"></div>
+                            <div class="feature-text">
+                                <h3>نظام تحفيزي ومجتمع تشاركي</h3>
+                                <p>حوّل المذاكرة إلى لعبة ممتعة! أنجز التحديات اليومية، اجمع النقاط، وتنافس مع زملائك في لوحة الصدارة. يمكنك أيضاً مشاركة أفضل مواردك معهم لمساعدة بعضكم البعض.</p>
+                            </div>
+                            <div class="feature-image">
+                                <img src="https://i.ibb.co/P9tLg3D/feature3.png" alt="نظام تحفيزي">
+                            </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="container landing-section">
                     <h2>أسئلة شائعة</h2>
                      <div style="max-width: 700px; margin: 0 auto;">
-                        <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)">هل الموقع مجاني بالكامل؟</div><div class="faq-answer"><p>نعم، جميع الميزات الحالية في الموقع مجانية تماماً. هدفنا هو مساعدة أكبر عدد ممكن من الطلاب.</p></div></div>
-                         <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)">كيف يعمل المساعد الذكي؟</div><div class="faq-answer"><p>نستخدم أحدث نماذج الذكاء الاصطناعي من Google (Gemini API) لتحليل النصوص وتقديم إجابات ذكية ودقيقة بناءً على طلبك.</p></div></div>
-                         <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)">هل بياناتي آمنة؟</div><div class="faq-answer"><p>بالتأكيد. يتم تخزين بياناتك بشكل آمن، وكلمات المرور الخاصة بك مشفرة بالكامل. خصوصيتك هي أولويتنا القصوى.</p></div></div>
+                        <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFaq(this)">هل الموقع مجاني بالكامل؟</div>
+                            <div class="faq-answer"><p>نعم، جميع الميزات الحالية في الموقع مجانية تماماً. هدفنا هو مساعدة أكبر عدد ممكن من الطلاب.</p></div>
+                        </div>
+                         <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFaq(this)">كيف يعمل المساعد الذكي؟</div>
+                            <div class="faq-answer"><p>نستخدم أحدث نماذج الذكاء الاصطناعي من Google (Gemini API) لتحليل النصوص وتقديم إجابات ذكية ودقيقة بناءً على طلبك.</p></div>
+                        </div>
+                         <div class="faq-item">
+                            <div class="faq-question" onclick="toggleFaq(this)">هل بياناتي آمنة؟</div>
+                            <div class="faq-answer"><p>بالتأكيد. يتم تخزين بياناتك بشكل آمن، وكلمات المرور الخاصة بك مشفرة بالكامل. خصوصيتك هي أولويتنا القصوى.</p></div>
+                        </div>
                     </div>
                 </div>
-                <div style="background: rgba(255,255,255,0.7); backdrop-filter: blur(5px);"><div class="container landing-section"><h2>جاهز لتبدأ رحلة التفوق؟</h2><button onclick="navigateTo('login')" class="cta-button">أنشئ حسابك المجاني الآن</button></div></div>`;
+                
+                <div style="background: rgba(255,255,255,0.7); backdrop-filter: blur(5px);">
+                    <div class="container landing-section">
+                        <h2>جاهز لتبدأ رحلة التفوق؟</h2>
+                        <button onclick="navigateTo('login')" class="cta-button">أنشئ حسابك المجاني الآن</button>
+                    </div>
+                </div>`;
+
             document.getElementById('login-section').innerHTML = `<div class="card" style="max-width: 400px; margin: 50px auto;"><h2 style="text-align: center;">تسجيل الدخول</h2><input type="text" id="username-input" placeholder="اسم المستخدم"><input type="password" id="password-input" placeholder="كلمة المرور"><button onclick="login()">دخول</button><div class="auth-toggle"><a class="nav-link" onclick="navigateTo('signup')">ليس لديك حساب؟ أنشئ واحداً</a></div></div>`;
             document.getElementById('signup-section').innerHTML = `<div class="card" style="max-width: 400px; margin: 50px auto;"><h2 style="text-align: center;">إنشاء حساب جديد</h2><input type="text" id="signup-username" placeholder="اسم المستخدم (إنجليزية)"><input type="password" id="signup-password" placeholder="كلمة المرور"><input type="password" id="signup-confirm-password" placeholder="تأكيد كلمة المرور"><button onclick="register()">إنشاء حساب</button><div class="auth-toggle"><a class="nav-link" onclick="navigateTo('login')">لديك حساب بالفعل؟</a></div></div>`;
+            
             document.getElementById('app-section').innerHTML = `
-                <header class="card" style="margin-bottom: 20px;"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;"><span id="welcome-message"></span><button onclick="logout()" style="width: auto; background-color: var(--danger-color);">تسجيل الخروج</button></div></header>
-                <div class="card" style="margin-bottom: 20px; background-color: var(--primary-dark); color: white;"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;"><div id="challenge-container"><h3 style="color: white; margin: 0 0 5px 0;">🎯 تحدي اليوم</h3><p id="challenge-text" style="margin: 0;">جاري تحميل التحدي...</p></div><button onclick="openLeaderboard()" class="success" style="width: auto; padding: 10px 20px;">🏆 لوحة الصدارة</button></div></div>
+                <header class="card" style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                       <span id="welcome-message"></span>
+                       <button onclick="logout()" style="width: auto; background-color: var(--danger-color);">تسجيل الخروج</button>
+                    </div>
+                </header>
+                <div class="card" style="margin-bottom: 20px; background-color: var(--primary-dark); color: white;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        <div id="challenge-container">
+                           <h3 style="color: white; margin: 0 0 5px 0;">🎯 تحدي اليوم</h3>
+                           <p id="challenge-text" style="margin: 0;">جاري تحميل التحدي...</p>
+                        </div>
+                        <button onclick="openLeaderboard()" class="success" style="width: auto; padding: 10px 20px;">🏆 لوحة الصدارة</button>
+                    </div>
+                </div>
                 <div class="main-grid">
                     <div class="card">
                         <h2>المواد الدراسية</h2>
                         <input type="text" id="subject-name-input" placeholder="اسم المادة الجديدة">
-                        <select id="subject-priority-select"><option value="High">أولوية عالية</option><option value="Medium" selected>أولوية متوسطة</option><option value="Low">أولوية منخفضة</option></select>
+                        <select id="subject-priority-select">
+                            <option value="High">أولوية عالية</option>
+                            <option value="Medium" selected>أولوية متوسطة</option>
+                            <option value="Low">أولوية منخفضة</option>
+                        </select>
                         <button onclick="addSubject()">إضافة مادة</button>
                         <ul id="subjects-list" style="margin-top: 20px;"></ul>
                     </div>
                     <div id="main-content" style="display: none;" class="card">
                         <h2 id="current-subject-title"></h2>
-                        <div id="resource-library"><h3>📚 مكتبة الموارد</h3><div id="resources-list"></div><h4>إضافة مورد جديد:</h4><input type="text" id="resource-title-input" placeholder="عنوان المورد"><select id="resource-type-select"><option value="youtube">رابط يوتيوب</option><option value="link">رابط موقع/ملف</option><option value="note">ملاحظة نصية</option></select><textarea id="resource-content-input" placeholder="ضع الرابط هنا أو اكتب ملاحظتك" rows="3"></textarea><button onclick="addResource()">إضافة المورد</button></div>
+                        <div id="resource-library">
+                            <h3>📚 مكتبة الموارد</h3>
+                            <div id="resources-list"></div>
+                            <h4>إضافة مورد جديد:</h4>
+                            <input type="text" id="resource-title-input" placeholder="عنوان المورد">
+                            <select id="resource-type-select">
+                                <option value="youtube">رابط يوتيوب</option>
+                                <option value="link">رابط موقع/ملف</option>
+                                <option value="note">ملاحظة نصية</option>
+                            </select>
+                            <textarea id="resource-content-input" placeholder="ضع الرابط هنا أو اكتب ملاحظتك" rows="3"></textarea>
+                            <button onclick="addResource()">إضافة المورد</button>
+                        </div>
                         <hr style="margin: 40px 0;">
                         <div id="flashcard-maker">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;"><h3>🃏 البطاقات التعليمية</h3><button id="start-quiz-btn" class="success" style="width: auto; padding: 8px 15px;" onclick="startQuiz()">بدء الاختبار</button></div>
-                            <div id="flashcards-list"></div><h4>إنشاء بطاقة جديدة:</h4><input type="text" id="flashcard-question-input" placeholder="اكتب السؤال هنا"><textarea id="flashcard-answer-input" placeholder="اكتب الجواب هنا" rows="2"></textarea><button onclick="addFlashcard()">إضافة بطاقة</button>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h3>🃏 البطاقات التعليمية</h3>
+                                <button id="start-quiz-btn" class="success" style="width: auto; padding: 8px 15px;" onclick="startQuiz()">بدء الاختبار</button>
+                            </div>
+                            <div id="flashcards-list"></div>
+                            <h4>إنشاء بطاقة جديدة:</h4>
+                            <input type="text" id="flashcard-question-input" placeholder="اكتب السؤال هنا">
+                            <textarea id="flashcard-answer-input" placeholder="اكتب الجواب هنا" rows="2"></textarea>
+                            <button onclick="addFlashcard()">إضافة بطاقة</button>
                         </div>
                     </div>
                 </div>`;
-            // --- [تم التعديل] AI Modal with New Chat Button ---
+            
             document.getElementById('ai-modal').innerHTML = `
                 <div class="modal-content">
                     <div id="ai-modal-header">
                         <h3>🤖 المساعد الذكي</h3>
-                        <button onclick="newAIChat()" style="width:auto; font-size: 0.8em; padding: 5px 10px;">محادثة جديدة</button>
                         <span class="close-button" onclick="closeModal('ai-modal')">&times;</span>
                     </div>
                     <div id="ai-chat-history"><div class="chat-bubble ai-bubble">أهلاً بك! كيف أساعدك اليوم؟</div></div>
                     <div id="ai-input-container">
-                         <div style="text-align: right; margin-bottom: 10px; font-size: 0.9em;"><label><input type="checkbox" id="personalize-toggle"> تحليل بياناتي لتقديم نصيحة شخصية</label></div>
+                         <div style="text-align: right; margin-bottom: 10px; font-size: 0.9em;">
+                            <label><input type="checkbox" id="personalize-toggle"> تحليل بياناتي لتقديم نصيحة شخصية</label>
+                        </div>
                         <div id="ai-prompt-controls">
                             <input type="text" id="ai-prompt" placeholder="اسأل أو اطلب إنشاء اختبار..." onkeydown="if(event.key==='Enter') handleAIPrompt()">
                             <button onclick="handleAIPrompt()">إرسال</button>
@@ -328,30 +389,191 @@
         }
         
         // --- Authentication ---
-        async function login() { /* ... unchanged ... */ }
-        async function register() { /* ... unchanged ... */ }
-        function logout() { /* ... unchanged ... */ }
-        
+        async function login() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value;
+            if (!username || !password) return alert('الرجاء ملء كل الحقول.');
+            const result = await callAppsScript('loginUser', [username, password]);
+            if (result && result.userId) {
+                localStorage.setItem('userId', result.userId);
+                localStorage.setItem('username', result.username);
+                navigateTo('dashboard');
+            }
+        }
+        async function register() {
+            const username = document.getElementById('signup-username').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm-password').value;
+            if (!username || !password) return alert('الرجاء ملء كل الحقول.');
+            if (password !== confirm) return alert('كلمتا المرور غير متطابقتين.');
+            const result = await callAppsScript('registerUser', [username, password]);
+            if (result && result.success) {
+                alert(result.message);
+                navigateTo('login');
+            }
+        }
+        function logout() {
+            localStorage.clear();
+            document.getElementById('welcome-message').textContent = '';
+            navigateTo('home');
+        }
+
         // --- Subjects ---
-        async function loadSubjects() { /* ... unchanged ... */ }
-        async function addSubject() { /* ... unchanged ... */ }
-        function selectSubject(id, name) { /* ... unchanged ... */ }
+        async function loadSubjects() {
+            subjectData = await callAppsScript('getSubjects', [currentUserId]) || [];
+            const list = document.getElementById('subjects-list');
+            list.innerHTML = '';
+            subjectData.forEach(s => {
+                const li = document.createElement('li');
+                li.dataset.id = s.id;
+                li.innerHTML = `
+                    <span style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${s.name}</span>
+                    <button onclick="event.stopPropagation(); shareSubject('${s.id}', '${s.name}')" class="ai-tool-btn" style="background-color: var(--warning-color); color: #333; font-size:0.7em; padding: 4px 8px; margin-left: 10px; border: none;" title="مشاركة المادة">🔗</button>
+                    <span class="priority-dot priority-${s.priority}"></span>`;
+                li.onclick = () => selectSubject(s.id, s.name);
+                list.appendChild(li);
+            });
+        }
+        async function addSubject() {
+            const name = document.getElementById('subject-name-input').value.trim();
+            const priority = document.getElementById('subject-priority-select').value;
+            if (!name) return;
+            await callAppsScript('addSubject', [currentUserId, name, priority]);
+            document.getElementById('subject-name-input').value = '';
+            loadSubjects();
+            updateUserPointsDisplay();
+        }
+        function selectSubject(id, name) {
+            currentSubjectId = id;
+            document.querySelectorAll('#subjects-list li').forEach(li => li.classList.toggle('active', li.dataset.id === id));
+            document.getElementById('current-subject-title').textContent = `محتوى مادة: ${name}`;
+            document.getElementById('main-content').style.display = 'block';
+            loadResources();
+            loadFlashcards();
+        }
 
         // --- Resources ---
-        async function loadResources() { /* ... unchanged ... */ }
-        async function addResource() { /* ... unchanged ... */ }
+        async function loadResources() {
+            resourcesData = await callAppsScript('getResources', [currentUserId, currentSubjectId]) || [];
+            const list = document.getElementById('resources-list');
+            list.innerHTML = '';
+            if (resourcesData.length === 0) {
+                list.innerHTML = '<p>لا توجد موارد لهذه المادة بعد.</p>';
+                return;
+            }
+            resourcesData.forEach(res => {
+                const div = document.createElement('div');
+                div.className = 'resource-item';
+                let contentHTML = `<strong>${res.title}</strong><br>`;
+                
+                if (res.type === 'note') {
+                    contentHTML += `<p style="white-space: pre-wrap; margin-top: 5px;">${res.content}</p>`;
+                    contentHTML += `<div style="position: absolute; top: 10px; left: 10px; display: flex; gap: 5px;">
+                        <button class="ai-tool-btn" onclick="summarizeNote('${res.id}')">لخص</button>
+                        <button class="ai-tool-btn" onclick="generateFlashcardsFromNote('${res.id}')">حوّل لبطاقات</button>
+                    </div>`;
+                } else {
+                    contentHTML += `<a href="${res.content}" target="_blank" rel="noopener noreferrer">فتح المصدر</a>`;
+                }
+                
+                div.innerHTML = contentHTML;
+                list.appendChild(div);
+            });
+        }
+        async function addResource() {
+            const title = document.getElementById('resource-title-input').value.trim();
+            const type = document.getElementById('resource-type-select').value;
+            const content = document.getElementById('resource-content-input').value.trim();
+            if(!title || !content) return;
+            await callAppsScript('addResource', [currentUserId, currentSubjectId, type, content, title]);
+            document.getElementById('resource-title-input').value = '';
+            document.getElementById('resource-content-input').value = '';
+            loadResources();
+            updateUserPointsDisplay();
+        }
         
         // --- Flashcards & Quiz ---
-        async function loadFlashcards() { /* ... unchanged ... */ }
-        async function addFlashcard() { /* ... unchanged ... */ }
+        async function loadFlashcards() {
+            flashcardData = await callAppsScript('getFlashcards', [currentUserId, currentSubjectId]) || [];
+            const list = document.getElementById('flashcards-list');
+            list.innerHTML = '';
+            if(flashcardData.length === 0) {
+                list.innerHTML = '<p>لا توجد بطاقات لهذه المادة بعد.</p>';
+                return;
+            }
+            flashcardData.forEach(card => {
+                list.innerHTML += `<div class="flashcard-item"><strong>س:</strong> ${card.question}<br><strong>ج:</strong> ${card.answer}</div>`;
+            });
+        }
+        async function addFlashcard() {
+            const question = document.getElementById('flashcard-question-input').value.trim();
+            const answer = document.getElementById('flashcard-answer-input').value.trim();
+            if(!question || !answer) return;
+            await callAppsScript('addFlashcard', [currentUserId, currentSubjectId, question, answer]);
+            document.getElementById('flashcard-question-input').value = '';
+            document.getElementById('flashcard-answer-input').value = '';
+            loadFlashcards();
+            updateUserPointsDisplay();
+        }
         function startQuiz() { alert('سيتم تنفيذ ميزة الاختبار الذكي قريباً.'); }
 
-        // --- Gamification & Sharing ---
-        async function getTodaysChallenge() { /* ... unchanged ... */ }
-        async function completeChallenge(challengeId) { /* ... unchanged ... */ }
-        async function openLeaderboard() { /* ... unchanged ... */ }
-        async function shareSubject(subjectId, subjectName) { /* ... unchanged ... */ }
-        async function importSharedPack(packId) { /* ... unchanged ... */ }
+        // --- New Features (Gamification & Sharing) ---
+        async function getTodaysChallenge() {
+            const challenge = await callAppsScript('getTodaysChallenge', [currentUserId], false);
+            const container = document.getElementById('challenge-text');
+            if (challenge) {
+                container.innerHTML = `${challenge.description} (+${challenge.points} نقطة) <button class="success" style="width:auto; font-size: 0.8em; padding: 5px 10px; margin-right: 10px;" onclick="completeChallenge('${challenge.id}')">أكملت التحدي</button>`;
+            } else {
+                container.textContent = 'رائع! لقد أكملت كل التحديات المتاحة اليوم.';
+            }
+        }
+        async function completeChallenge(challengeId) {
+            const result = await callAppsScript('completeChallenge', [currentUserId, challengeId]);
+            if (result.success) {
+                alert(`أحسنت! حصلت على ${result.pointsAwarded} نقطة.`);
+                updateUserPointsDisplay();
+                getTodaysChallenge();
+            }
+        }
+        async function openLeaderboard() {
+            const modal = document.getElementById('leaderboard-modal');
+            modal.innerHTML = `<div class="modal-content"><span class="close-button" onclick="closeModal('leaderboard-modal')">&times;</span><h3>🏆 لوحة الصدارة</h3><ol id="leaderboard-list"><li>جاري التحميل...</li></ol></div>`;
+            modal.style.display = 'block';
+            const data = await callAppsScript('getLeaderboard', [], false);
+            const list = document.getElementById('leaderboard-list');
+            list.innerHTML = '';
+            if (data) {
+                data.forEach(user => {
+                    list.innerHTML += `<li>${user.username} - <strong>${user.points} نقطة</strong></li>`;
+                });
+            }
+        }
+        async function shareSubject(subjectId, subjectName) {
+            showLoader();
+            const result = await callAppsScript('createStudyPack', [currentUserId, subjectId], false);
+            hideLoader();
+            if (result && result.packId) {
+                const link = `${window.location.origin}${window.location.pathname}#import/${result.packId}`;
+                const modal = document.getElementById('share-modal');
+                modal.innerHTML = `<div class="modal-content">
+                    <span class="close-button" onclick="closeModal('share-modal')">&times;</span>
+                    <h3>🔗 مشاركة "${subjectName}"</h3>
+                    <p>انسخ الرابط وأرسله لزملائك:</p>
+                    <input type="text" value="${link}" id="share-link-input" readonly style="direction: ltr;">
+                    <button onclick="document.getElementById('share-link-input').select(); document.execCommand('copy'); alert('تم نسخ الرابط!');">نسخ</button>
+                </div>`;
+                modal.style.display = 'block';
+            }
+        }
+        async function importSharedPack(packId) {
+            if (confirm("هل تريد استيراد حزمة المذاكرة هذه؟ ستُضاف كمادة جديدة لحسابك.")) {
+                const result = await callAppsScript('importStudyPack', [currentUserId, packId]);
+                if (result.success) {
+                    alert(`تم استيراد المادة "${result.newSubjectName}" بنجاح!`);
+                    loadSubjects();
+                }
+            }
+        }
 
         // --- AI Functions ---
         async function handleAIPrompt() {
@@ -360,17 +582,12 @@
             document.getElementById('ai-prompt').value = '';
             const chatHistory = document.getElementById('ai-chat-history');
             chatHistory.innerHTML += `<div class="chat-bubble user-bubble">${prompt}</div>`;
-            
-            // [تم التفعيل] Show typing indicator
-            const typingIndicator = showTypingIndicator(chatHistory);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
 
             const isPersonal = document.getElementById('personalize-toggle').checked;
             const action = isPersonal ? 'callPersonalizedAI' : 'callGeminiAI';
             const params = isPersonal ? [currentUserId, prompt] : [prompt];
             const result = await callAppsScript(action, params, false);
-            
-            // [تم التفعيل] Remove typing indicator
-            typingIndicator.remove();
             
             chatHistory.innerHTML += `<div class="chat-bubble ai-bubble">${result ? marked.parse(result) : 'حدث خطأ ما.'}</div>`;
             chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -380,34 +597,36 @@
             if (!topic) return alert("اكتب موضوع الاختبار أولاً.");
             const chatHistory = document.getElementById('ai-chat-history');
             chatHistory.innerHTML += `<div class="chat-bubble user-bubble">أنشئ اختبار عن: ${topic}</div>`;
-            const typingIndicator = showTypingIndicator(chatHistory);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
 
             const quizData = await callAppsScript('generateAiQuiz', [topic], false);
-            typingIndicator.remove();
-
             if (quizData) {
                 let quizHtml = `<h4>📝 اختبار سريع عن "${topic}":</h4><div class="quiz-review">`;
                 quizData.forEach((q, i) => {
-                    quizHtml += `<div class="quiz-question"><p><strong>${i + 1}. ${q.question}</strong></p><ul>${q.options.map(opt => `<li>${opt}</li>`).join('')}</ul><p style="color: var(--success-color);"><em>الإجابة: ${q.answer}</em></p></div>`;
+                    quizHtml += `<div class="quiz-question">
+                                 <p><strong>${i + 1}. ${q.question}</strong></p>
+                                 <ul>${q.options.map(opt => `<li>${opt}</li>`).join('')}</ul>
+                                 <p style="color: var(--success-color);"><em>الإجابة: ${q.answer}</em></p>
+                               </div>`;
                 });
                 chatHistory.innerHTML += `<div class="chat-bubble ai-bubble">${quizHtml}</div>`;
+                chatHistory.scrollTop = chatHistory.scrollHeight;
             } else {
                  chatHistory.innerHTML += `<div class="chat-bubble ai-bubble">عذراً، لم أتمكن من إنشاء اختبار.</div>`;
+                 chatHistory.scrollTop = chatHistory.scrollHeight;
             }
-            chatHistory.scrollTop = chatHistory.scrollHeight;
         }
         
-        // --- AI Helpers for Resources ---
+        // --- [تم التفعيل] AI Helpers for Resources ---
         async function summarizeNote(resourceId) {
             const resource = resourcesData.find(r => r.id === resourceId);
             if (!resource) return;
             openAIModal();
             const chatHistory = document.getElementById('ai-chat-history');
             chatHistory.innerHTML += `<div class="chat-bubble user-bubble">لخص لي الملاحظة: "${resource.title}"</div>`;
-            const typingIndicator = showTypingIndicator(chatHistory);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
 
             const summary = await callAppsScript('summarizeText', [resource.content], false);
-            typingIndicator.remove();
             chatHistory.innerHTML += `<div class="chat-bubble ai-bubble">${summary ? marked.parse(summary) : 'لم أتمكن من تلخيص النص.'}</div>`;
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
@@ -417,15 +636,16 @@
             openAIModal();
             const chatHistory = document.getElementById('ai-chat-history');
             chatHistory.innerHTML += `<div class="chat-bubble user-bubble">حوّل الملاحظة "${resource.title}" إلى بطاقات</div>`;
-            const typingIndicator = showTypingIndicator(chatHistory);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
 
             const generatedCards = await callAppsScript('generateFlashcardsFromText', [resource.content], false);
-            typingIndicator.remove();
             
             if (generatedCards && generatedCards.length > 0) {
                 tempGeneratedCards = generatedCards;
                 let cardsHtml = `<h4>تم إنشاء ${generatedCards.length} بطاقة. هل تريد إضافتها للمادة الحالية؟</h4><ul>`;
-                generatedCards.forEach(c => { cardsHtml += `<li><strong>س:</strong> ${c.question}</li>`; });
+                generatedCards.forEach(c => {
+                    cardsHtml += `<li><strong>س:</strong> ${c.question}</li>`;
+                });
                 cardsHtml += `</ul><button class="success" style="width:auto; padding: 8px 15px;" onclick="addGeneratedCards(this)">نعم، أضفهم الآن</button>`;
                 chatHistory.innerHTML += `<div class="chat-bubble ai-bubble">${cardsHtml}</div>`;
             } else {
@@ -438,11 +658,14 @@
             if (!tempGeneratedCards) return;
             button.disabled = true;
             button.textContent = 'جاري الحفظ...';
+
             for (const card of tempGeneratedCards) {
                 await callAppsScript('addFlashcard', [currentUserId, currentSubjectId, card.question, card.answer], false);
             }
+            
             tempGeneratedCards = null;
             button.parentElement.innerHTML += "<p><strong>تمت إضافة البطاقات بنجاح!</strong></p>";
+            
             loadFlashcards();
             updateUserPointsDisplay();
         }
@@ -459,8 +682,14 @@
         }
         function openChangePasswordModal() {
              const modal = document.getElementById('change-password-modal');
-             modal.innerHTML = `<div class="modal-content"><span class="close-button" onclick="closeModal('change-password-modal')">&times;</span><h3>🔑 تغيير كلمة المرور</h3><input type="password" id="old-password" placeholder="كلمة المرور القديمة"><input type="password" id="new-password" placeholder="كلمة المرور الجديدة"><button onclick="changePassword()">تغيير</button></div>`;
-             modal.style.display = 'block';
+             modal.innerHTML = `<div class="modal-content">
+                <span class="close-button" onclick="closeModal('change-password-modal')">&times;</span>
+                <h3>🔑 تغيير كلمة المرور</h3>
+                <input type="password" id="old-password" placeholder="كلمة المرور القديمة">
+                <input type="password" id="new-password" placeholder="كلمة المرور الجديدة">
+                <button onclick="changePassword()">تغيير</button>
+            </div>`;
+            modal.style.display = 'block';
         }
         async function changePassword() {
             const oldPass = document.getElementById('old-password').value;
@@ -479,18 +708,6 @@
             } else {
                 answer.style.display = "block";
             }
-        }
-        // [تمت الإضافة] New helper functions
-        function showTypingIndicator(chatHistoryContainer) {
-            const typingIndicator = document.createElement('div');
-            typingIndicator.className = 'chat-bubble typing-indicator';
-            typingIndicator.innerHTML = '<span></span><span></span><span></span>';
-            chatHistoryContainer.appendChild(typingIndicator);
-            chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
-            return typingIndicator;
-        }
-        function newAIChat() {
-            document.getElementById('ai-chat-history').innerHTML = '<div class="chat-bubble ai-bubble">أهلاً بك من جديد! كيف يمكنني المساعدة؟</div>';
         }
 
         window.onload = () => {
